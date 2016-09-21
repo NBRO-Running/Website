@@ -1,0 +1,100 @@
+/* newsletter */
+.bg-default {
+	.simplenews-subscribe, .simplenews-unsubscribe {
+		background-color: #141414;
+	}
+}
+.simplenews-subscribe {
+	margin: 0 auto 20px;
+	padding: 0 30px;
+    position: relative;
+    width: 35%;
+	z-index: 1;
+	.form-item {
+		background-color: white;
+		display: block;
+		margin: 0;
+		padding-right: 45px;
+		position: relative;
+		z-index: 1;
+		&:after {
+			content: "\f1d8";
+			@include fontawesome;
+			font-size: $fontsize-14;
+			right: 0;
+			line-height: 40px;
+			position: absolute;
+			text-align: center;
+			text-indent: 0;
+			top: 0;
+			width: 45px;
+			z-index: 1;
+		}
+		&:hover:after, &:focus:after {
+			color: $primary-color;
+		}
+		.form-text {
+			background-color: white;
+			border-color: white;
+			line-height: 1.4;
+			text-transform: uppercase;
+			width: 100%;
+		}
+		input.error {
+			border-color: white;
+			color: red;
+		}
+	}
+	label {
+		font-size: .857em;
+		display: none;
+	}
+	.form-submit {
+		background-color: rgba(white,0);
+		border: none;
+		cursor: pointer;
+		height: 40px;
+		padding: 0;
+		position: absolute;
+		right: 30px;
+		text-indent: -99999em;
+		top: 0;
+		width: 45px;
+		z-index: 2;
+		&:hover, &:focus {
+			background: none;
+			border: none;
+		}
+	}
+}
+.simplenews-unsubscribe {
+	margin: 0 auto 20px;
+	padding: 0 30px;
+    position: relative;
+    width: 35%;
+	z-index: 1;
+	.form-submit {
+		background-color: #fff;
+		border-color: white;
+		color: $text-color;
+		width: 100%;
+		&:hover, &:focus {
+			background-color: $primary-color !important;
+			border-color: $primary-color;
+			color: #fff !important;
+		}
+	}
+}
+.logged-in .simplenews-subscribe .form-submit {
+	background-color: #fff;
+	border: 1px solid #fff;
+	color: #000;
+	position: static;
+	text-indent: 0;
+	width: 100%;
+	&:hover, &:focus {
+		background-color: $primary-color;
+		border-color: $primary-color;
+		color: #fff;
+	}
+}

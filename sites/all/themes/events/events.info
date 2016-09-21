@@ -1,0 +1,89 @@
+name = Events
+description = Theme for Event.
+version = VERSION
+core = 7.x
+engine = 'phptemplate'
+
+stylesheets[all][] = vendor/bootstrap/css/bootstrap.css
+stylesheets[all][] = vendor/bootstrap/css/bootstrap-theme.css
+stylesheets[all][] = vendor/time_circles/TimeCircles.css
+stylesheets[all][] = vendor/jquery-ui/css/smoothness/jquery-ui-1.10.4.custom.min.css
+stylesheets[all][] = vendor/jcoverflip/jcoverflip.css
+stylesheets[all][] = css/html.css
+stylesheets[all][] = css/base.css
+stylesheets[all][] = css/block.css
+stylesheets[all][] = css/view.css
+stylesheets[all][] = css/menu.css
+stylesheets[all][] = css/page.css
+stylesheets[all][] = css/animate.css
+
+; Responsive
+stylesheets[only screen and (max-width:991px)][] = 'css/mobile-menu.css'
+stylesheets[only screen and (max-width:1199px)][] = 'css/theme-responsive.css'
+
+scripts[] = 'vendor/bootstrap/js/bootstrap.min.js'
+scripts[] = 'js/jquery.cookie.js'
+scripts[] = 'js/jquery.smooth-scroll.js'
+scripts[] = 'vendor/velocity/velocity.min.js'
+scripts[] = 'vendor/velocity/velocity.ui.min.js'
+scripts[] = 'vendor/jquery-animateNumber/jquery.animateNumber.min.js'
+scripts[] = 'vendor/waypoints.min.js'
+scripts[] = 'vendor/time_circles/TimeCircles.js'
+scripts[] = 'vendor/jcoverflip/jquery.jcoverflip.js'
+scripts[] = 'js/mobile_menu.js'
+scripts[] = 'js/weebpal.js'
+scripts[] = 'js/events.js'
+
+
+features[] = 'logo'
+features[] = 'name'
+features[] = 'slogan'
+features[] = 'node_user_picture'
+features[] = 'comment_user_picture'
+features[] = 'comment_user_verification'
+features[] = 'favicon'
+
+regions[headline] = Headline
+regions[header] = Header
+regions[banner] = Banner
+regions[main_menu] = Main Menu
+regions[slideshow] = Slideshow
+regions[help] = Help
+regions[page_top] = Page top
+regions[page_bottom] = Page bottom
+regions[highlighted] = Highlighted
+regions[content] = Content
+regions[sidebar_first] = Sidebar first
+regions[sidebar_second] = Sidebar second
+
+regions[panel_first] = Panel First
+regions[panel_second] = Panel Second
+regions[panel_third] = Panel Third
+regions[panel_fourth] = Panel Fourth
+regions[panel_fifth] = Panel Fifth
+regions[panel_sixth] = Panel Sixth
+regions[panel_seventh] = Panel Seventh
+
+
+regions[panel_footer_first] = Panel Footer First
+regions[panel_footer_second_1] = Panel Footer Second 1
+regions[panel_footer_second_2] = Panel Footer Second 2
+regions[panel_footer_second_3] = Panel Footer Second 3
+regions[footer] = Footer
+
+settings[sidebar_first_width] = 3
+settings[sidebar_second_width] = 3
+
+settings[panel_footer_second_1_width] = 4
+settings[panel_footer_second_2_width] = 4
+settings[panel_footer_second_3_width] = 4
+
+skins[blue] = 'Blue'
+skins[green] = 'Green'
+skins[yellow] = 'Yellow'
+
+backgrounds[bg-default] = 'Dark Background'
+backgrounds[bg-light] = 'Light Background'
+
+layout[layout-boxed] = Boxed Layout
+settings[layout_width_default] = 1320

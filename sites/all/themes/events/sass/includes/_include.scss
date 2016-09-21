@@ -1,0 +1,220 @@
+/* COLORS */
+$primary-color: #ffdd00;
+$text-color: #888;
+$black: #000;
+$white: #fff;
+
+/* font size */
+$fontsize-11: 0.786em;
+$fontsize-12: 0.857em;
+$fontsize-13: 0.929em;
+$fontsize-14: 1em;
+$fontsize-16: 1.143em;
+$fontsize-17: 1.214em;
+$fontsize-18: 1.286em;
+$fontsize-20: 1.429em;
+$fontsize-24: 1.714em;
+$fontsize-25: 1.785em;
+$fontsize-30: 2.143em;
+$fontsize-36: 2.571em;
+$fontsize-40: 2.857em;
+$fontsize-48: 3.429em;
+$fontsize-50: 3.571em;
+$fontsize-56: 4em;
+$fontsize-67: 4.785em;
+$fontsize-70: 5em;
+
+@mixin title-font-lg {
+  font-family: 'bebas_neue_regularregular';
+}
+
+@mixin title-font-md {
+  font: {
+    family: 'Tinos', serif;
+    style: italic;
+  };
+}
+
+@mixin body-font {
+  font-family: 'open_sanslight';
+}
+
+@mixin fontawesome {
+  display: inline-block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+%center {
+  text-align: center;
+}
+
+%bg-white {
+  background-color: #fff;
+  color: #6e6e6e;
+  display: inline-block;
+  line-height: 1;
+  padding: 15px;
+  @extend %center;
+  text-transform: uppercase;
+  &:hover {
+    background-color: $primary-color;
+    color: #fff;
+  }
+  &:after {
+    content: "\f178";
+    @include fontawesome;
+    padding-left: 6px;
+  }
+}
+
+%item-list-ul {
+  list-style: none;
+  margin: 0;
+}
+
+/* link underline */
+@mixin link-under {
+  position: relative;
+  &:before {
+    border-bottom: 3px solid #fff;
+    bottom: 0;
+    content: "";
+    left: 20px;
+    position: absolute;
+    right: 20px;
+  }
+}
+
+/* :after */
+@mixin btn {
+  display: block;
+  height: 50px;
+  line-height: 50px;
+  position: relative;
+  @extend %center;
+  text-indent: -9999em;
+  width: 50px;
+  &:after {
+    @include fontawesome;
+    line-height: 50px;
+    text-indent: 0;
+    position: absolute;
+    left: 0;
+    width: 100%;
+  }
+}
+
+@mixin underline {
+  padding-bottom: 12px;
+  position: relative;
+  &:before, &:after {
+    bottom: 0;
+    content: "";
+    position: absolute;
+    width: auto;
+  }
+  &:before {
+    border-bottom: 1px solid rgba(white, 0.1);
+    left: 40px;
+    right: 40px;
+    z-index: 1;
+  }
+  &:after {
+    border-bottom: 2px solid $primary-color;
+    left: 70px;
+    right: 70px;
+    z-index: 2;
+  }
+}
+
+/* line-through */
+@mixin line-through {
+  position: relative;
+  &:after {
+    background-color: rgba($text-color, 0.1);
+    content: "";
+    display: block;
+    height: 1px;
+    left: 0;
+    margin-top: -1px;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+  }
+}
+
+/* */
+@mixin transition($transition...) {
+  -webkit-transition: $transition;
+  -ms-transition: $transition;
+  transition: $transition;
+}
+
+@mixin transition-transform($transition...) {
+  -webkit-transition: -webkit-transform $transition;
+  -moz-transition: -moz-transform $transition;
+  -ms-transition: -o-transform $transition;
+  transition: transform $transition;
+}
+
+@mixin transform($rotate...) {
+  -webkit-transform: rotate($rotate); /* Chrome, Safari, Opera */
+  transform: rotate($rotate);
+}
+
+@mixin scale($x, $y) {
+  -ms-transform: scale($x, $y); /* IE 9 */
+  -webkit-transform: scale($x, $y); /* Chrome, Safari, Opera */
+  transform: scale($x, $y);
+}
+
+@mixin translate($x, $y) {
+  -webkit-transform: translate($x, $y);
+  transform: translate($x, $y);
+}
+
+@mixin translate3d($x, $y, $z) {
+  -webkit-transform: translate3d($x, $y, $z);
+  transform: translate3d($x, $y, $z);
+}
+
+@mixin transition-delay($transition-delay) {
+  -webkit-transition-delay: $transition-delay;
+  transition-delay: $transition-delay;
+}
+
+@mixin transition-duration($transition-duration...) {
+  -webkit-transition-duration: $transition-duration;
+  transition-duration: $transition-duration;
+}
+
+@mixin box-shadow($shadow...) {
+  -webkit-box-shadow: $shadow; // iOS <4.3 & Android <4.1
+  box-shadow: $shadow;
+}
+
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  // IE8 filter
+  $opacity-ie: $opacity * 100;
+  filter: #{alpha(opacity = $opacity-ie)};
+}
+
+@mixin clearfix {
+  &:after {
+    content: '.';
+    height: 0;
+    clear: both;
+    display: block;
+    visibility: hidden;
+  }
+}
+
+@mixin border-radius($radius) {
+  border-radius: #{$radius};
+  -webkit-border-radius: #{$radius};
+}

@@ -1,0 +1,14 @@
+; $Id$
+name = Commmerce QuickPay
+description = Process Commerce payments using QuickPay.
+package = QuickPay payment gateway
+dependencies[] = quickpay
+dependencies[] = commerce_payment
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2016-02-27
+version = "7.x-1.12"
+core = "7.x"
+project = "quickpay"
+datestamp = "1456597140"
+

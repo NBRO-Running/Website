@@ -1,0 +1,179 @@
+/* event calendar*/
+.event-calendar{
+  .view-header{
+    background-color: #212121;
+    padding:{
+      top: 10px;
+      bottom: 10px;
+    }
+    .date-nav-wrapper{
+      margin-top: 0;
+      h3{
+        @include title-font-lg;
+        font-size: $fontsize-20;
+        text-transform: uppercase;
+      }
+      .date-nav{
+        margin-bottom: 0;
+		min-height: 0;
+        padding-bottom: 0;
+      }
+      .pager{
+		margin-top: 0;
+        li{
+          background: none;
+          @include border-radius(0);
+          padding: 0;
+          margin-bottom: 0;
+          text-align: center;
+          top: 8px;
+          a{
+            font-weight: normal;
+            margin-left: 0;
+            margin-right: 0;
+            text-indent: -999em;
+            display: block;
+            width: 10px;
+            height: 15px;
+            &:before{
+              @include fontawesome;
+              position: absolute;
+              width: 10px;
+              height: 15px;
+              line-height: 15px;
+              text-align: center;
+              left: 0;
+              top: 0;
+              text-indent: 0;
+              font-size: 25px;
+            }
+            &:hover, &:focus{
+              color: $primary-color;
+			  background: none;
+            }
+          }
+        }
+        .date-prev{
+          right: auto;
+          left: 50%;
+          margin-left: -130px;
+          a{
+            &:before{
+              content: "\f104";
+            }
+          }
+        }
+        .date-next{
+          right: 50%;
+          margin-right: -130px;
+          a{
+            &:before{
+              content: "\f105";
+            }
+          }
+        }
+      }
+    }
+
+  }
+  .calendar-calendar{
+    table{
+      thead{
+        tr{
+          border-top: 1px solid #141414;
+          border-bottom: 1px solid #141414;
+        }
+      }
+      th.days{
+        background-color: #303030;
+        padding: 15px;
+        font-size: $fontsize-20;
+        @include title-font-lg;
+        color: $primary-color;
+        border-color: #141414;
+        border-left: none;
+        border-top: none;
+        border-bottom: none;
+		line-height: 1;
+        &:last-child{
+          border-right: none;
+        }
+      }
+      tbody{
+        .day{
+          font-size: $fontsize-14;
+          padding: 0;
+          width: auto;
+          text-align: left;
+          float: none;
+        }
+        tr.single-day, tr.date-box{
+          td{
+            border-color: #141414;
+            border-left: none;
+          }
+          td.single-day.empty, td.date-box.empty{
+            background-color: #1c1c1c;
+          }
+        }
+        tr.single-day{
+          td{
+            padding: 8px 15px 15px !important;
+          }
+        }
+        tr.date-box{
+          td{
+            padding: 8px 15px;
+          }
+        }
+        tr{
+          td.single-day.today, td.date-box.today{
+            background-color: #212121;
+            color: #fff;
+            border-color: #141414 !important;
+            border-width: 1px !important;
+          }
+          td.date-box.today{
+            border-bottom: none !important;
+          }
+        }
+        td{
+          border-left: none;
+          font-size: $fontsize-20;
+          @include title-font-lg;
+          color: $text-color;
+          text-align: left;
+          border-right: 1px solid #141414;
+          background-color: #212121;
+
+        }
+        td.single-day{
+          .inner{
+            div.monthview{
+              .stripe{
+                display: none;
+              }
+              border-radius: 0;
+              -webkit-border-radius: 0;
+              border: none;
+              padding: 0;
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .views-field-type-image{
+    &:before{
+      background: none;
+      position: static;
+    }
+  }
+
+}
+/* end event calendar */
+.calendar-calendar .month-view .full td.single-day .inner div, .calendar-calendar .month-view .full td.single-day .inner div a, .calendar-calendar .month-view .full td.multi-day .inner div, .calendar-calendar .month-view .full td.multi-day .inner div a, .calendar-calendar .month-view .full td .inner div.calendar.monthview div, .calendar-calendar .month-view .full td .inner div.calendar.monthview div a, .calendar-calendar .week-view .full td.single-day .inner div, .calendar-calendar .week-view .full td.single-day .inner div a, .calendar-calendar .week-view .full td.multi-day .inner div, .calendar-calendar .week-view .full td.multi-day .inner div a, .calendar-calendar .week-view .full td .inner div.calendar.weekview div, .calendar-calendar .week-view .full td .inner div.calendar.weekview div a, .calendar-calendar .day-view .full td .inner div.view-item, .calendar-calendar .day-view .full td .inner div.calendar div, .calendar-calendar .day-view .full td .inner div.calendar div a {
+	background: none !important;
+}

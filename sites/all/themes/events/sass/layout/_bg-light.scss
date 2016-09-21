@@ -1,0 +1,320 @@
+.boxed {
+	.affix {
+		max-width: 1320px;
+	}
+}
+
+.bg-light {
+	.form-text, .form-textarea, .form-select {
+		background-color: #f3f3f3;
+		border-color: #f3f3f3;
+	}
+	#page, .headline {
+		background-color: #fff;
+	}
+	
+	.shopping-cart {
+		.view-footer .line-item-quantity-raw {
+			color: #888;
+		}
+	}
+	
+	.ui-jcoverflip--item {
+		background-color: #f3f3f3;
+		.views-field-view-node a {
+			background-color: #c7c7c7;
+			&:hover, &:focus {
+				background-color: $primary-color;
+			}
+		}
+		&.active {
+			@include box-shadow(0 0 4px rgba(black,.2));
+		}
+	}
+	
+	.view-footer .ui-slider {
+		background: #c7c7c7;
+		.ui-slider-handle {
+			background: #363636;
+		}
+	}
+	.jcarousel-skin-default {
+		.jcarousel-next,
+		.jcarousel-prev {
+			background: #ebebeb;
+		}
+	}
+	/* panel-fourth */
+	#panel-fourth, #panel-second {
+		h2 {
+			color: #363636;
+			span:before {
+				border-bottom-color: rgba(black, .1);
+			}
+		}
+	}
+	&.not-front #panel-fourth h2 {
+		color: #fff;
+	}
+	#panel-footer-second h2 {
+		color: #363636;
+	}
+	.panel-column cite {
+		color: #363636;
+	}
+	/****/
+	.speakers-views .col-inner {
+		border-color: rgba(black, .2);
+	}
+	/****/
+	.event-tickets {
+		.item-list > ul > li > .node {
+			background-color: #f3f3f3;
+		}
+		.field-name-field-ticket .form-submit {
+			background-color: #c7c7c7;
+			border-color: #c7c7c7;
+			&:hover, &:focus {
+				background-color: $primary-color;
+				border-color: $primary-color;
+			}
+		}
+		.field-name-commerce-price {
+			border-bottom-color: #ddd;
+		}
+	}
+	/****/
+	.simplenews-subscribe, .simplenews-unsubscribe {
+		background-color: #fff;
+	}
+
+	.simplenews-subscribe {
+		.form-item {
+			background-color: #ebebeb;
+			.form-text {
+				background-color: #ebebeb;
+				border-color: #ebebeb;
+			}
+			input.error {
+				border-color: #ebebeb;
+				color: red;
+			}
+		}
+	}
+	.simplenews-unsubscribe .form-submit {
+		background-color: #ebebeb;
+		border-color: #ebebeb;
+		&:hover, &:focus {
+			background-color: $primary-color !important;
+			border-color: $primary-color;
+		}
+	}
+	&.logged-in .simplenews-subscribe .form-submit {
+		background-color: #ebebeb;
+		border-color: #ebebeb;
+		&:hover, &:focus {
+			background-color: $primary-color !important;
+			border-color: $primary-color;
+		}
+	}
+	/****/
+	.btn-btt {
+		border-color: #363636;
+	}
+	/****/
+	.partner-list {
+		&:before, &:after {
+			@include opacity(.5);
+		}
+	}
+	/****/
+	.news-type .views-field-view-node a {
+		background-color: #c7c7c7;
+		color: #fff;
+		&:hover, &:focus {
+			background-color: $primary-color;
+		}
+	}
+	.news-list {
+		.views-row {
+			background-color: #f3f3f3;
+		}
+	}
+	.news-grid {
+		.grid-inner {
+			background-color: #f3f3f3;
+		}
+	}
+	/****/
+	.event-type {
+		.views-field-view-node a {
+			background-color: #c7c7c7;
+			color: #363636;
+			&:hover, &:focus {
+				background-color: $primary-color;
+				color: #fff;
+			}
+		}
+		.views-field-field-speakers strong,
+		.views-label-field-speakers, 
+		.views-field-field-location strong {
+			color: #888;
+		}
+	}
+	.event-list .views-row,
+	.event-grid .fieldset {
+		background-color: #f3f3f3;
+	}
+	.event-list .views-field-field-location,
+	.event-grid .views-field-field-speakers,
+	.event-grid .views-field-field-location	{
+		border-top-color: #c7c7c7;
+	}
+	.event-grid .views-field-field-location {
+		border-bottom-color: #c7c7c7;
+	}
+	/****/
+	.speakers-views .views-exposed-form .form-text {
+		background-color: #f3f3f3;
+		border-color: #f3f3f3;
+	}
+	.panel-group .panel-collapse {
+		background-color: #f3f3f3;
+	}
+	.panel {
+		@include box-shadow(none)
+	}
+	.iframe-map iframe {
+		border: none;
+	}
+	.contact-address {
+		border-top-color: #f3f3f3;
+	}
+	#contact-site-form .form-text, #contact-site-form .form-textarea {
+		background-color: #f3f3f3;
+		border-color: #f3f3f3;
+	}
+	&.not-front #panel-fifth h2, .about-us-content .views-field-title {
+		color: #888;
+	}
+	&.not-front .happy-clients .flexslider .fieldset {
+		background-color: #f3f3f3;
+	}
+	.item-list .pager {
+		a:hover, a:focus, .pager-current {
+			background-color: #c7c7c7;
+			color: #fff;
+		}
+	}
+	.sidebar {
+		.block-menu {
+			ul.menu {
+				li {
+					border-bottom-color: rgba(0, 0, 0, 0.04);
+				}
+			}
+		}
+	}
+	.latest-news {
+		.views-row + .views-row {
+			border-top-color: rgba(0, 0, 0, 0.04);
+		}
+		.views-field-created {
+			color: #ddd;
+		}
+	}
+	/////////////
+	#main #content .node {
+		.field-group-htabs-wrapper .group-buy-ticket .node {
+			background-color: #f3f3f3;
+			.field-name-title-field h2 {
+				color: #888;
+			}
+		}
+		.field-name-field-speakers .field-label,
+		.field-name-field-date .field-label,
+		.field-name-field-time .field-label,
+		.field-name-field-location .field-label {
+			color: #888;
+		}
+		.field-name-field-speakers,
+		.field-name-field-date,
+		.field-name-field-time,
+		.field-name-field-location {
+			border-bottom-color: #ddd;
+		}
+	}
+	/////////////
+	#comments {
+		.form-text, .form-textarea {
+			background-color: #f3f3f3;
+			border-color: #f3f3f3;
+		}
+	}
+	.comment h3 a {
+		color: #363636;
+	}
+	.comment-form {
+		border-top-color: #ddd;
+	}
+	.field-collection-view, .comment-preview {
+		border-bottom-color: #ddd;
+	}
+
+	#main {
+		#content {
+			.node {
+				.field-name-body {
+					blockquote {
+						background-color: #f3f3f3;
+					}
+				}
+			}
+		}
+	}
+	#search-form #edit-basic, legend, #search-form legend {
+		border-color: #ddd;
+	}
+	.contact-info {
+		a {
+			color: #363636;
+			&:hover, &:focus {
+				color: $primary-color;
+			}
+		}
+	}
+	/* commerce-checkout-form-complete */
+	#commerce-checkout-form-complete {
+		.checkout-completion-message {
+			a {
+				color: #363636;
+				&:hover, &:focus {
+					color: $primary-color;
+				}
+			}
+		}
+	}
+	/* .cart-review table */
+	.cart-review {
+		table {
+			background-color: #f3f3f3;
+			thead, tbody tr {
+				border-bottom-color: #eee;
+			}
+		}
+		.view-footer {
+			background-color: #f3f3f3;
+			border-top-color: #eee;
+		}
+		.views-field-edit-quantity .form-text {
+			background-color: #eee;
+			border-color: #ddd;
+		}
+	}
+	#commerce-checkout-form-review .checkout-review {
+		background-color: #f3f3f3;
+		tr {
+			border-bottom-color: #ddd;
+		}
+	}
+}

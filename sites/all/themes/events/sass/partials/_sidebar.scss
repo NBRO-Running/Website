@@ -1,0 +1,52 @@
+.sidebar {
+  .block{
+    margin-bottom: 70px;
+    &:last-child{
+      margin-bottom: 0;
+    }
+  }
+	.block > h2 {
+		@include body-font;
+		font-size: $fontsize-25;
+		margin-bottom: 35px;
+	}
+	.block-menu {
+		ul.menu {
+			list-style: none;
+			padding-left: 0;
+			li {
+				border-bottom: 1px solid rgba(white,.04);
+				margin-bottom: 10px;
+				padding-bottom: 10px;
+			}
+		}
+	}
+}
+
+.latest-news {
+	.views-field-created {
+		margin-bottom: 0;
+	}
+	.views-field-type-image {
+		float: left;
+		margin-bottom: 0;
+		margin-right: 15px;
+		width: 60px;
+	}
+	.views-row {
+		overflow: hidden;
+		+ .views-row {
+			border-top: 1px solid rgba(white,.04);
+			margin-top: 20px;
+			padding-top: 20px;
+		}
+	}
+	.views-field-title {
+		margin-bottom: 5px;
+	}
+	
+	.views-field-created { 
+		color: #444;
+		font-size: $fontsize-13;
+	}
+}

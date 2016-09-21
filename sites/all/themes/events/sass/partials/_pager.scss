@@ -1,0 +1,86 @@
+/* start pager */
+.item-list{
+  .pager{
+    margin-bottom: 0;
+    text-align: right;
+    margin-top: 30px;
+    li{
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 0;
+      a{
+        background: none;
+        border: none;
+        color: #888;
+        display: block;
+        width: 40px;
+        height: 40px;
+        border-radius: 0;
+        -webkit-border-radius: 0;
+        text-align: center;
+        line-height: 40px;
+        padding: 0;
+        &:hover, &:focus{
+          background-color: #212121;
+        }
+      }
+    }
+    .pager-current{
+      background-color: #212121;
+      border: none;
+      color: #888;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
+    }
+    .pager-next, .pager-last, .pager-first, .pager-previous{
+      a{
+        text-indent: -999em;
+        position: relative;
+        &:before{
+          @include fontawesome;
+          display: inline-block;
+          text-indent: 0;
+          width: 40px;
+          height: 40px;
+          position: absolute;
+          text-align: center;
+          line-height: 40px;
+          left: 0;
+          top: 0;
+        }
+      }
+    }
+    .pager-next{
+      a{
+        &:before{
+          content: "\f105";
+        }
+      }
+    }
+    .pager-previous{
+      a{
+        &:before{
+          content: "\f104";
+        }
+      }
+    }
+    .pager-last{
+      a{
+        &:before{
+          content: "\f101";
+        }
+      }
+    }
+    .pager-first{
+      a{
+        &:before{
+			content: "\f100";
+		}
+      }
+    }
+  }
+}
+
+/* end pager */

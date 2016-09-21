@@ -1,0 +1,4 @@
+name = Weebpal Banner
+description = Makes a block that can be used to dynamically place a banner on any page you wish to support.
+dependencies[] = path
+core = 7.x

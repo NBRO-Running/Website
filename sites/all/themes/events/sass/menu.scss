@@ -1,0 +1,262 @@
+@import "includes/_include";
+
+.header {
+  background-color: $primary-color;
+  position: relative;
+  width: 100%;
+  .region-header {
+    position: relative;
+    width: 100%;
+  }
+}
+
+#logo {
+  float: left;
+  margin: 30px 0;
+}
+
+@media (min-width: 992px) {
+  #main-menu-inner {
+    @include clearfix;
+    float: right;
+    padding-right: 30px;
+    ul.menu {
+      margin: 0;
+      padding-left: 0;
+      position: relative;
+      > li {
+        list-style: none;
+        float: left;
+        > a {
+          color: #000;
+          display: inline-block;
+          font-weight: 100;
+          padding: 35px 20px 34px;
+          text-transform: uppercase;
+          &:focus, &:hover {
+            background-color: transparent;
+            &:after {
+              color: #fff;
+            }
+          }
+        }
+        &.expanded > a {
+          position: relative;
+          &:after {
+            color: #000;
+            content: "\f107";
+            @include fontawesome;
+            margin-left: 4px;
+          }
+        }
+        &:hover, &:focus {
+          > a {
+            @include link-under;
+            color: #fff;
+            &:after {
+              color: #fff;
+            }
+          }
+          ul {
+            display: block;
+          }
+        }
+        &.active-trail {
+          > a {
+            color: #fff;
+            @include link-under;
+            &:after {
+              color: #fff;
+            }
+          }
+        }
+      }
+      ul {
+        background-color: #fff;
+        display: none;
+        position: absolute;
+        top: 94px;
+        left: 0;
+        text-align: center;
+        width: 100%;
+        z-index: 100;
+        li {
+          float: none;
+          display: inline-block;
+          a {
+            padding: 18px 17px;
+            text-transform: none;
+            &:hover, &:focus {
+              color: $primary-color;
+            }
+            &.active {
+              color: $primary-color;
+            }
+          }
+        }
+      }
+    }
+  }
+  .tb-megamenu-main-menu {
+    background-color: transparent;
+    position: static;
+    text-transform: uppercase;
+    .caret {
+      display: none;
+    }
+    .nav {
+      > li {
+        position: static;
+        > a {
+          border-right: none;
+          color: #000;
+          font-weight: 100;
+          padding-bottom: 34px;
+          padding-top: 35px;
+          &:focus, &:hover {
+            background-color: transparent;
+            color: #fff;
+            @include link-under;
+            &:after {
+              color: #fff;
+            }
+          }
+        }
+        .dropdown-toggle {
+          .caret {
+            display: none !important;
+          }
+          &:after {
+            color: #000;
+            content: "\f107";
+            @include fontawesome;
+          }
+        }
+      }
+      li.dropdown a:hover, li.dropdown a:focus {
+        &:before {
+          display: none;
+        }
+      }
+      li.dropdown > .dropdown-toggle .caret {
+        display: none !important;
+      }
+      .open > a, .open > a:hover, .open > a:focus {
+        background-color: transparent;
+        color: #fff;
+        &:after {
+          color: #fff;
+        }
+      }
+      > .active > a,
+      > .active > a:hover,
+      > .active > a:focus {
+        background-color: transparent;
+        color: #fff;
+        @include link-under;
+      }
+      li.dropdown.open > .dropdown-toggle {
+        background-color: transparent;
+        color: #fff;
+      }
+      li.dropdown.open {
+        .tb-megamenu-submenu {
+          a {
+            color: #7d7d7d;
+            border-color: #ddd;
+            &:hover, &:focus {
+              color: $primary-color;
+            }
+          }
+        }
+      }
+      li.dropdown.active > .dropdown-toggle,
+      li.dropdown.open.active > .dropdown-toggle,
+      > li.dropdown.open.active > a:hover {
+        background-color: transparent;
+        color: #fff;
+        &:after {
+          color: #fff;
+        }
+      }
+    }
+    .dropdown-menu {
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      text-align: center;
+      text-transform: none;
+      width: 100%;
+      li {
+        display: inline-block;
+        > a {
+          border: none;
+          &:hover, &:focus {
+            color: $primary-color;
+          }
+        }
+      }
+      .active > a, .active > a:hover {
+        background-color: transparent;
+        background-image: none;
+        color: $primary-color !important;
+      }
+    }
+    .mega-nav > li,
+    .dropdown-menu .mega-nav > li {
+      display: inline-block;
+      padding: 20px 17px;
+      a {
+        font-weight: 500;
+        padding: 0;
+      }
+      .dropdown-menu {
+        padding: {
+          bottom: 10px;
+          top: 10px;
+        };
+        text-align: left;
+      }
+      li {
+        padding: {
+          bottom: 5px;
+          top: 5px;
+        };
+      }
+    }
+    .span12.mega-col-nav .mega-inner {
+      padding: 0;
+    }
+    .dropdown-submenu {
+      > a:after {
+        display: none !important;
+      }
+      > .dropdown-menu {
+        left: 0;
+        margin-top: 0;
+        top: 100%;
+      }
+    }
+  }
+}
+
+.affix {
+  background-color: rgba($primary-color, 0.75);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99;
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+  .tb-megamenu .nav > li > a {
+    padding: {
+      left: 15px;
+      right: 15px;
+    };
+  }
+}
+
+.btn-close {
+  display: none;
+}

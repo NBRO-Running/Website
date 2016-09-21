@@ -1,0 +1,219 @@
+/* main slideshow */
+.flex-direction-nav {
+	a {
+		@include opacity(1);
+		margin: 0;
+		text-indent: -9999em;
+		&:before {
+			@include fontawesome;
+			height: 100%;
+			left: 0;
+			line-height: 70px;
+			position: absolute;
+			text-indent: 0;
+			text-align: center;
+			width: 100%;
+		}
+		&.flex-prev {
+			left: -35px;
+			&:before {
+				content: "\f104";
+				padding-left: 30px;
+			}
+		}
+		&.flex-next {
+			right: -35px;
+			text-align: left;
+			&:before {
+				content: "\f105";
+				padding-right: 30px;
+			}
+		}
+	}
+}
+
+.flex-control-paging li a {
+	background-color: #fff;
+	&.flex-active {
+		background-color: $primary-color;
+	}
+}
+
+.flexslider {
+	background: none;
+	border: none;
+	border-radius: 0;
+	@include box-shadow(none);
+	margin: 0;
+	.views-field, .field {
+		margin-bottom: 0;
+	}
+	.flex-direction-nav a {
+		background-color: #fff;
+		color: $text-color;
+		display: block;
+		height: 70px;
+		margin-top: -35px;
+		text-shadow: none;
+		width: 70px;
+		@include transform(45deg);
+		&:before {
+			font-size: 25px;
+			@include transform(-45deg);
+		}
+		&:hover {
+			background-color: $primary-color;
+			color: #fff;
+		}
+	}
+	&:hover {
+		.flex-prev { @include opacity(1); left: -35px; }
+		.flex-next { @include opacity(1); right: -35px; }
+	}
+}
+
+.slideshow-views .flex-control-nav {
+	bottom: 40px;
+	z-index: 3;
+}
+
+.slideshow {
+	position: relative;
+}
+
+.countdown-views {
+	background: url(../images/dot.gif) repeat rgba(black,.7);
+	bottom: 0;
+	color: white;
+	height: 100%;
+	left: 0;
+	padding: 0 30px 0 10%;
+	position: absolute;
+	text-align: right;
+	top: 0;
+	width: 50%;
+	z-index: 2;
+	.views-field-field-date-1 {
+		margin-bottom: 20px;
+	}
+	h2 span, .date-display-single {
+		color: $text-color;
+		@include body-font;
+	}
+	.views-field-view-node {
+		margin-bottom: 0;
+		a {
+			@extend %bg-white;
+			min-width: 180px;
+		}
+	}
+	.views-field-body {
+		color: $text-color;
+		margin-bottom: 55px;
+	}
+	.views-field-title {
+		margin-bottom: 5px;
+	}
+	h2 {
+		margin-bottom: 0;
+		span {
+			font-size: .45em;
+			display: block;
+			margin-bottom: 12px;
+		}
+	}
+	.content, .view, .view-content, .views-row {
+		height: 100%;
+		width: 100%;
+	}
+	.view-content {
+		display: table;
+		.views-row {
+			display: table-cell;
+			vertical-align: middle;
+		}
+	}
+}
+
+.time_circles {
+	> div {
+		> h4 {
+			font-weight: 700;
+			margin-top: 28px;
+		}
+		> span {
+			@include title-font-lg;
+			font: {
+				size: $fontsize-67 !important;
+				weight: 700;
+			}
+			margin-top: 7px;
+		}
+	}
+}
+
+@media (min-width: 1121px) {
+	.time_circles > div {
+		> h4 {
+			font-size: $fontsize-12 !important;
+		}
+	}
+}
+
+@media (min-width: 992px) and (max-width: 1120px) {
+	.time_circles > div {
+		> span {
+			font-size: $fontsize-50 !important;
+		}
+		> h4 {
+			font-size: 9px !important;
+			margin-top: 22px;
+		}
+	}
+}
+
+.happy-clients {
+	.flexslider {
+		.slides {
+			margin: 0 auto;
+			width: 770px;
+			img {
+				border-radius: 50%;
+				height: auto;
+				max-width: 100%;
+				width: auto;
+			}
+		}
+		.views-field-picture {
+			border: 6px solid #2f2f2f;
+			border-radius: 50%;
+			left: -50px;
+			position: absolute;
+			top: -25px;
+			width: 100px;
+		}
+		.views-field-name, .views-field-field-full-name {
+			@include title-font-md;
+			font: {
+				size: $fontsize-20;
+				style: italic;
+				weight: 700;
+			}
+			margin-bottom: 10px;
+			text-transform: capitalize;
+			a {
+				color: $primary-color;
+			}
+		}
+		.fieldset {
+			background-color: #fff;
+			padding: 20px 20px 20px 80px;
+		}
+		.flex-control-nav {
+			bottom: -60px;
+          z-index: 3;
+		}
+	}
+}
+
+

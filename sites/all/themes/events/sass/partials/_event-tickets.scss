@@ -1,0 +1,79 @@
+/* tickets */
+.event-tickets {
+	.item-list > ul {
+		@extend %item-list-ul;
+		margin-left: -30px;
+		overflow: hidden;
+		> li {
+			float: left;
+			margin: 0;
+			width: 25%;
+			> .node {
+				background-color: #212121;
+				margin-left: 30px;
+				padding: 25px 20px 0;
+				h2 {
+					color: white;
+					@include title-font-md;
+					font-size: $fontsize-25;
+					margin: 0;
+					a {
+						color: white;
+					}
+				}
+			}
+		}
+	}
+	.field-name-title-field {
+		margin-bottom: 0;
+	}
+	.field-name-commerce-price {
+		border-bottom: 1px solid rgba(white, .05);
+		color: $primary-color;
+		@include title-font-lg;
+		font: {
+			size: $fontsize-70;
+			weight: 700;
+		}
+		line-height: 1.4;
+		@extend %center;
+		margin-bottom: 35px;
+	}
+	.field-name-field-ticket {
+		margin-bottom: 0;
+		text-align: right;
+		.form-submit {
+			background-color: #363636;
+			border-color: #363636;
+			color: white;
+			height: 50px;
+			margin-right: -20px;
+			padding: 0;
+			text-transform: uppercase;
+			width: 50px;
+			&:hover {
+				background-color: $primary-color;
+				border-color: $primary-color;
+			}
+		}
+	}
+}
+.field-name-field-product-description {
+	margin-bottom: 35px;
+	ul {
+		@extend %item-list-ul;
+	}
+	li {
+		line-height: 1.4;
+		margin: 0 0 15px !important;
+		padding: 0 0 0 20px !important;
+		position: relative;
+		&:before {
+			content: "\f00c";
+			@include fontawesome;
+			left: 0;
+			position: absolute;
+			top: 0;
+		}
+	}
+}

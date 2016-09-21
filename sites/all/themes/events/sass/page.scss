@@ -1,0 +1,315 @@
+@import "includes/_include";
+
+#page {
+    overflow: hidden;
+    position: relative;
+    float: none;
+}
+
+.container {
+    position: relative;
+}
+
+.bg-default #page {
+    background-color: #141414;
+}
+
+/* panel-first */
+#panel-first {
+    background-image: url(../images/bg-01.jpg);
+    background-position: fixed;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    color: #fff;
+    padding-bottom: 65px;
+    position: relative;
+    &:after {
+        background-color: rgba($primary-color, 0.85);
+        content: "";
+        height: 100%;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1;
+    }
+}
+
+/* panel-fourth */
+#panel-fourth, #panel-second, #panel-fifth {
+    padding: 50px 0;
+    h2 {
+        color: white;
+        @extend %center;
+        span {
+            display: inline-block;
+            @include underline;
+            z-index: 2;
+        }
+    }
+}
+
+#panel-second, #panel-fourth .block >, #panel-fifth .block > {
+    h2 {
+        margin-bottom: 55px;
+    }
+}
+
+/* panel-fifth */
+#panel-fifth {
+    background-image: url(../images/bg-02.jpg);
+    background-position: fixed;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 100px;
+    position: relative;
+    &:after {
+        background: url(../images/triangle.png) repeat;
+        content: "";
+        height: 100%;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1;
+    }
+}
+
+.front #panel-fifth .container, .front #panel-third .container {
+    padding-left: 0;
+    padding-right: 0;
+    width: auto;
+}
+
+.front #panel-fifth {
+    margin-bottom: 80px;
+}
+
+/* panel-sixth */
+#panel-sixth {
+    padding: 0 0 80px;
+    .block-block {
+        padding-top: 40px;
+        text-align: center;
+    }
+}
+
+.btn-become {
+    background-color: #222;
+    border: none;
+    color: #fff;
+    display: inline-block;
+    font-weight: 700;
+    margin: 0 auto;
+    min-width: 185px;
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: uppercase;
+    &:hover, &:focus {
+        background-color: $primary-color;
+        color: #fff;
+    }
+}
+
+@media (min-width: 1025px) {
+    #panel-sixth .container {
+        padding-left: 0;
+        padding-right: 0;
+        width: auto;
+    }
+}
+
+@media (max-width: 991px) {
+    #panel-sixth .container {
+        padding-left: 0;
+        padding-right: 0;
+        width: auto;
+    }
+}
+
+/* panel-footer-first */
+.block-simplenews {
+    @include line-through;
+}
+
+/* panel-footer-second */
+#panel-footer-second {
+    padding: 50px 0;
+    h2 {
+        @include title-font-md;
+        font-size: $fontsize-25;
+        color: white;
+        text-transform: capitalize;
+    }
+}
+
+.panel-column {
+    ul.menu {
+        list-style: none;
+        padding: 0;
+        a {
+            color: $text-color;
+            &:hover, &:focus {
+                color: $primary-color;
+            }
+        }
+        a.active {
+            color: $primary-color;
+        }
+    }
+    blockquote {
+        border-left: none;
+        font-size: $fontsize-14;
+        margin: 0;
+        padding: 0;
+        &:before, &:after {
+            color: $primary-color;
+            @include fontawesome;
+        }
+        &:before {
+            content: "\f10d";
+            padding-right: 5px;
+        }
+        &:after {
+            content: "\f10e";
+            padding-left: 5px;
+        }
+        p {
+            display: inline;
+        }
+    }
+    cite {
+        color: white;
+        font-style: italic;
+    }
+    i {
+        margin-right: 5px;
+    }
+}
+
+.contact-info {
+    a {
+        color: #fff;
+        &:hover, &:focus {
+            color: $primary-color;
+        }
+    }
+}
+
+/* footer */
+#footer {
+    background-color: #212121;
+    font-size: $fontsize-13;
+    p {
+        margin: 10px 0;
+    }
+}
+
+/* .profile */
+.profile h3 {
+    border-bottom-color: rgba(white, 0.1);
+    padding-bottom: 10px;
+}
+
+/* contact-personal-form */
+#contact-personal-form {
+    input[type="radio"], input[type="checkbox"] {
+        margin: 0;
+    }
+    .form-item {
+        display: block;
+        label {
+            display: block;
+        }
+    }
+    .form-type-checkbox, #edit-to {
+        label {
+            display: inline-block;
+        }
+    }
+}
+
+.error-404 {
+    background: url("../images/map.png") no-repeat 50% 50%;
+    padding: 160px 0;
+    text-align: center;
+    h2, p {
+        color: $primary-color;
+    }
+    h2 {
+        font-size: $fontsize-70;
+        margin: 0;
+    }
+    p {
+        font-size: $fontsize-40;
+        margin: 0 0 60px;
+    }
+    a {
+        background: #7d7d7d;
+        border: none;
+        color: #fff;
+        display: inline-block;
+        font-weight: 300;
+        min-width: 300px;
+        padding: 8px;
+        text-transform: uppercase;
+        &:hover, &:focus {
+            background-color: $primary-color;
+        }
+    }
+}
+
+.mfp-arrow {
+    @include opacity(1);
+    margin: 0;
+    text-indent: -9999em;
+    border: none;
+    background-color: #fff !important;
+    color: #888888;
+    display: block;
+    height: 70px;
+    margin-top: -35px;
+    text-shadow: none;
+    transform: rotate(45deg);
+    width: 70px;
+    &:before {
+        @include fontawesome;
+        font-size: 25px;
+        height: 100%;
+        left: 0;
+        line-height: 70px;
+        position: absolute;
+        text-indent: 0;
+        text-align: center;
+        width: 100%;
+        border: 0 none !important;
+        transform: rotate(-45deg);
+        margin: 0;
+        opacity: 1;
+    }
+    &:after {
+        content: normal;
+    }
+    &:active {
+        margin-top: -35px;
+    }
+    &.mfp-arrow-left {
+        left: -35px;
+        &:before {
+            content: "\f104";
+            padding-left: 30px;
+        }
+    }
+    &.mfp-arrow-right {
+        right: -35px;
+        text-align: left;
+        &:before {
+            content: "\f105";
+            padding-right: 30px;
+        }
+    }
+    &:hover, &:focus {
+        background-color: $primary-color !important;
+        &:before {
+            color: $white;
+        }
+    }
+}

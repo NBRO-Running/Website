@@ -1,0 +1,357 @@
+/* COLORS */
+/* font size */
+/* link underline */
+/* :after */
+/* line-through */
+/* */
+/* line 3, ../sass/menu.scss */
+.header {
+  background-color: #ffdd00;
+  position: relative;
+  width: 100%;
+}
+/* line 7, ../sass/menu.scss */
+.header .region-header {
+  position: relative;
+  width: 100%;
+}
+
+/* line 13, ../sass/menu.scss */
+#logo {
+  float: left;
+  margin: 30px 0;
+}
+
+@media (min-width: 992px) {
+  /* line 19, ../sass/menu.scss */
+  #main-menu-inner {
+    float: right;
+    padding-right: 30px;
+  }
+  /* line 208, ../sass/includes/_include.scss */
+  #main-menu-inner:after {
+    content: '.';
+    height: 0;
+    clear: both;
+    display: block;
+    visibility: hidden;
+  }
+  /* line 23, ../sass/menu.scss */
+  #main-menu-inner ul.menu {
+    margin: 0;
+    padding-left: 0;
+    position: relative;
+  }
+  /* line 27, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li {
+    list-style: none;
+    float: left;
+  }
+  /* line 30, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li > a {
+    color: #000;
+    display: inline-block;
+    font-weight: 100;
+    padding: 35px 20px 34px;
+    text-transform: uppercase;
+  }
+  /* line 36, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li > a:focus, #main-menu-inner ul.menu > li > a:hover {
+    background-color: transparent;
+  }
+  /* line 38, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li > a:focus:after, #main-menu-inner ul.menu > li > a:hover:after {
+    color: #fff;
+  }
+  /* line 43, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li.expanded > a {
+    position: relative;
+  }
+  /* line 45, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li.expanded > a:after {
+    color: #000;
+    content: "\f107";
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-left: 4px;
+  }
+  /* line 53, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li:hover > a, #main-menu-inner ul.menu > li:focus > a {
+    position: relative;
+    color: #fff;
+  }
+  /* line 82, ../sass/includes/_include.scss */
+  #main-menu-inner ul.menu > li:hover > a:before, #main-menu-inner ul.menu > li:focus > a:before {
+    border-bottom: 3px solid #fff;
+    bottom: 0;
+    content: "";
+    left: 20px;
+    position: absolute;
+    right: 20px;
+  }
+  /* line 56, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li:hover > a:after, #main-menu-inner ul.menu > li:focus > a:after {
+    color: #fff;
+  }
+  /* line 60, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li:hover ul, #main-menu-inner ul.menu > li:focus ul {
+    display: block;
+  }
+  /* line 65, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li.active-trail > a {
+    color: #fff;
+    position: relative;
+  }
+  /* line 82, ../sass/includes/_include.scss */
+  #main-menu-inner ul.menu > li.active-trail > a:before {
+    border-bottom: 3px solid #fff;
+    bottom: 0;
+    content: "";
+    left: 20px;
+    position: absolute;
+    right: 20px;
+  }
+  /* line 68, ../sass/menu.scss */
+  #main-menu-inner ul.menu > li.active-trail > a:after {
+    color: #fff;
+  }
+  /* line 74, ../sass/menu.scss */
+  #main-menu-inner ul.menu ul {
+    background-color: #fff;
+    display: none;
+    position: absolute;
+    top: 94px;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    z-index: 100;
+  }
+  /* line 83, ../sass/menu.scss */
+  #main-menu-inner ul.menu ul li {
+    float: none;
+    display: inline-block;
+  }
+  /* line 86, ../sass/menu.scss */
+  #main-menu-inner ul.menu ul li a {
+    padding: 18px 17px;
+    text-transform: none;
+  }
+  /* line 89, ../sass/menu.scss */
+  #main-menu-inner ul.menu ul li a:hover, #main-menu-inner ul.menu ul li a:focus {
+    color: #ffdd00;
+  }
+  /* line 92, ../sass/menu.scss */
+  #main-menu-inner ul.menu ul li a.active {
+    color: #ffdd00;
+  }
+
+  /* line 100, ../sass/menu.scss */
+  .tb-megamenu-main-menu {
+    background-color: transparent;
+    position: static;
+    text-transform: uppercase;
+  }
+  /* line 104, ../sass/menu.scss */
+  .tb-megamenu-main-menu .caret {
+    display: none;
+  }
+  /* line 108, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li {
+    position: static;
+  }
+  /* line 110, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li > a {
+    border-right: none;
+    color: #000;
+    font-weight: 100;
+    padding-bottom: 34px;
+    padding-top: 35px;
+  }
+  /* line 116, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li > a:focus, .tb-megamenu-main-menu .nav > li > a:hover {
+    background-color: transparent;
+    color: #fff;
+    position: relative;
+  }
+  /* line 82, ../sass/includes/_include.scss */
+  .tb-megamenu-main-menu .nav > li > a:focus:before, .tb-megamenu-main-menu .nav > li > a:hover:before {
+    border-bottom: 3px solid #fff;
+    bottom: 0;
+    content: "";
+    left: 20px;
+    position: absolute;
+    right: 20px;
+  }
+  /* line 120, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li > a:focus:after, .tb-megamenu-main-menu .nav > li > a:hover:after {
+    color: #fff;
+  }
+  /* line 126, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li .dropdown-toggle .caret {
+    display: none !important;
+  }
+  /* line 129, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > li .dropdown-toggle:after {
+    color: #000;
+    content: "\f107";
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* line 137, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown a:hover:before, .tb-megamenu-main-menu .nav li.dropdown a:focus:before {
+    display: none;
+  }
+  /* line 141, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown > .dropdown-toggle .caret {
+    display: none !important;
+  }
+  /* line 144, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav .open > a, .tb-megamenu-main-menu .nav .open > a:hover, .tb-megamenu-main-menu .nav .open > a:focus {
+    background-color: transparent;
+    color: #fff;
+  }
+  /* line 147, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav .open > a:after, .tb-megamenu-main-menu .nav .open > a:hover:after, .tb-megamenu-main-menu .nav .open > a:focus:after {
+    color: #fff;
+  }
+  /* line 151, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav > .active > a,
+  .tb-megamenu-main-menu .nav > .active > a:hover,
+  .tb-megamenu-main-menu .nav > .active > a:focus {
+    background-color: transparent;
+    color: #fff;
+    position: relative;
+  }
+  /* line 82, ../sass/includes/_include.scss */
+  .tb-megamenu-main-menu .nav > .active > a:before,
+  .tb-megamenu-main-menu .nav > .active > a:hover:before,
+  .tb-megamenu-main-menu .nav > .active > a:focus:before {
+    border-bottom: 3px solid #fff;
+    bottom: 0;
+    content: "";
+    left: 20px;
+    position: absolute;
+    right: 20px;
+  }
+  /* line 158, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown.open > .dropdown-toggle {
+    background-color: transparent;
+    color: #fff;
+  }
+  /* line 164, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown.open .tb-megamenu-submenu a {
+    color: #7d7d7d;
+    border-color: #ddd;
+  }
+  /* line 167, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown.open .tb-megamenu-submenu a:hover, .tb-megamenu-main-menu .nav li.dropdown.open .tb-megamenu-submenu a:focus {
+    color: #ffdd00;
+  }
+  /* line 173, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown.active > .dropdown-toggle,
+  .tb-megamenu-main-menu .nav li.dropdown.open.active > .dropdown-toggle,
+  .tb-megamenu-main-menu .nav > li.dropdown.open.active > a:hover {
+    background-color: transparent;
+    color: #fff;
+  }
+  /* line 178, ../sass/menu.scss */
+  .tb-megamenu-main-menu .nav li.dropdown.active > .dropdown-toggle:after,
+  .tb-megamenu-main-menu .nav li.dropdown.open.active > .dropdown-toggle:after,
+  .tb-megamenu-main-menu .nav > li.dropdown.open.active > a:hover:after {
+    color: #fff;
+  }
+  /* line 183, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-menu {
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    text-align: center;
+    text-transform: none;
+    width: 100%;
+  }
+  /* line 190, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-menu li {
+    display: inline-block;
+  }
+  /* line 192, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-menu li > a {
+    border: none;
+  }
+  /* line 194, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-menu li > a:hover, .tb-megamenu-main-menu .dropdown-menu li > a:focus {
+    color: #ffdd00;
+  }
+  /* line 199, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-menu .active > a, .tb-megamenu-main-menu .dropdown-menu .active > a:hover {
+    background-color: transparent;
+    background-image: none;
+    color: #ffdd00 !important;
+  }
+  /* line 205, ../sass/menu.scss */
+  .tb-megamenu-main-menu .mega-nav > li,
+  .tb-megamenu-main-menu .dropdown-menu .mega-nav > li {
+    display: inline-block;
+    padding: 20px 17px;
+  }
+  /* line 209, ../sass/menu.scss */
+  .tb-megamenu-main-menu .mega-nav > li a,
+  .tb-megamenu-main-menu .dropdown-menu .mega-nav > li a {
+    font-weight: 500;
+    padding: 0;
+  }
+  /* line 213, ../sass/menu.scss */
+  .tb-megamenu-main-menu .mega-nav > li .dropdown-menu,
+  .tb-megamenu-main-menu .dropdown-menu .mega-nav > li .dropdown-menu {
+    padding-bottom: 10px;
+    padding-top: 10px;
+    text-align: left;
+  }
+  /* line 220, ../sass/menu.scss */
+  .tb-megamenu-main-menu .mega-nav > li li,
+  .tb-megamenu-main-menu .dropdown-menu .mega-nav > li li {
+    padding-bottom: 5px;
+    padding-top: 5px;
+  }
+  /* line 227, ../sass/menu.scss */
+  .tb-megamenu-main-menu .span12.mega-col-nav .mega-inner {
+    padding: 0;
+  }
+  /* line 231, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-submenu > a:after {
+    display: none !important;
+  }
+  /* line 234, ../sass/menu.scss */
+  .tb-megamenu-main-menu .dropdown-submenu > .dropdown-menu {
+    left: 0;
+    margin-top: 0;
+    top: 100%;
+  }
+}
+/* line 243, ../sass/menu.scss */
+.affix {
+  background-color: rgba(255, 221, 0, 0.75);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99;
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+  /* line 252, ../sass/menu.scss */
+  .tb-megamenu .nav > li > a {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+/* line 260, ../sass/menu.scss */
+.btn-close {
+  display: none;
+}

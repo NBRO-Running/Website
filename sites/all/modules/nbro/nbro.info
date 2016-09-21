@@ -1,0 +1,3 @@
+name = NBRO Running
+description = Provides NBRO hooks and functions
+core = 7.x

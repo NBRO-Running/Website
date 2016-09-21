@@ -1,0 +1,65 @@
+/* Mobile menu */
+@media (max-width: 991px) {
+  #page {
+    padding-left: 0;
+    right: 0;
+    transition: all 0.5s ease-in-out;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    position: relative;
+    margin-right: 0;
+  }
+  #page.toggled {
+    right: 250px;
+  }
+  .btn-close {
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    display: block;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    padding: 5px 10px;
+    right: 0;
+    top: -30px;
+    font-size: 12px;
+    color: #aaa;
+  }
+  .btn-close:hover, .btn-close:focus {
+    color: white;
+  }
+  #page.toggled .mobile-main-menu {
+    right: 0;
+    display: block;
+  }
+  .overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+  }
+  /* main-menu */
+  .mobile-main-menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: -250px;
+    width: 250px;
+    height: 100%;
+    z-index: 1000;
+    overflow-y: auto !important;
+    background: #333;
+    transition: all 0.5s ease-in-out;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    display: block !important;
+    padding: 30px 0 0;
+  }
+}

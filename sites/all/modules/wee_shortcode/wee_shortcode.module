@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * @file
+ * Shortcode module.
+ */
+
+
+/**
+ * Implements hook_shortcode_info().
+ *
+ * Using the same formatting as hook_filter_info().
+ */
+function wee_shortcode_shortcode_info() {
+  $shortcodes['tooltip'] = array(
+    'title' => t('Tooltip'),
+    'description' => t('Replace the given text formatted like as a tooltip.'),
+    'process callback' => 'wee_shortcode_tooltip',
+    'tips callback' => 'wee_shortcode_tooltip_tip',
+  );
+
+  $shortcodes['collapse'] = array(
+    'title' => t('Collapse'),
+    'description' => t('Replace the given text formatted like as a collapse.'),
+    'process callback' => 'wee_shortcode_collapse',
+    'tips callback' => 'wee_shortcode_collapse_tip',
+  );
+
+  return $shortcodes;
+}
+
+/**
+ * Implements of hook_theme().
+ */
+function wee_shortcode_theme() {
+  return array(
+    'shortcode_tooltip' => array(
+      'variables' => array(
+        'id' => '',
+        'class' => '',
+        'placement' => '',
+        'title' => '',
+        'tag' => '',
+        'text' => '',
+      ),
+    ),
+    'shortcode_collapse' => array(
+      'variables' => array('accordions' => '', 'id' => ''),
+      'template' => 'collapse',
+      'path' => drupal_get_path('module', 'wee_shortcode') . '/tpl',
+    ),
+  );
+}
+
+
+/**
+ * Replace a given text formatted like a quote.
+ *
+ * @param array  $attrs
+ *   Attributes
+ * @param string $text
+ *   Text
+ */
+function wee_shortcode_tooltip($attrs, $text) {
+  $attrs = shortcode_attrs(array(
+      'id' => '',
+      'class' => 'wp-tooltip',
+      'placement' => 'top',
+      'title' => 'My tooltip',
+      'tag'   => 'button',
+    ),
+    $attrs
+  );
+  $attrs['class'] = shortcode_add_class($attrs['class'], 'wp-tooltip');
+  $attrs['tag']   = $attrs['tag'] ? $attrs['tag'] : 'button';
+  $attrs['id']    = $attrs['id'] ? $attrs['id'] : uniqid('wp-tooltip-');
+  $attrs['text']  = $text;
+
+  return theme('shortcode_tooltip', $attrs);
+}
+
+/**
+ * Shortcode parse accordions.
+ *
+ * @param string $text
+ *   Text that include shortcodes
+ */
+function _shortcodes_parse_accordions($text) {
+  $chunks = preg_split('!(\[{1,2}.*?\]{1,2})!', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+  $heap   = array();
+  $attr   = array();
+  $accordions = array();
+  foreach ($chunks as $chunk) {
+    $chunk = trim($chunk);
+    if (empty($chunk)) {
+      continue;
+    }
+
+    if ($chunk[0] == '[' && substr($chunk, -1, 1) == ']') {
+      $orignal = $chunk;
+      $chunk = substr($chunk, 1, -1);
+      $chunk = trim($chunk);
+
+      $parts = explode(' ', $chunk);
+      $tag   = array_shift($parts);
+      if ($tag == 'accordion') {
+        $attrs = _shortcode_parse_attrs(implode(' ', $parts));
+      }
+      elseif ($tag == '/accordion') {
+        $accord = array(
+          'text' => '',
+          'attrs' => $attrs,
+        );
+        while (!empty($heap)) {
+          $accord['text'] .= array_shift($heap);
+        }
+        $accordions[] = $accord;
+      }
+      else {
+        array_push($heap, $orignal);
+      }
+    }
+    else {
+      array_push($heap, $chunk);
+    }
+  }
+  return $accordions;
+}
+
+/**
+ * Shortcode collapse.
+ */
+function wee_shortcode_collapse($attrs, $text) {
+  $attrs['accordions'] = _shortcodes_parse_accordions($text);
+
+  $attrs['tagid']   = empty($attrs['id']) ? uniqid('wp-tooltip-') : $attrs['id'];
+
+  return theme('shortcode_collapse', $attrs);
+}
+
+/**
+ * Theme for shortcode tooltip.
+ */
+function theme_shortcode_tooltip($vars) {
+  $otag = '<' . $vars['tag'];
+  $ctag = '</' . $vars['tag'] . '>';
+  $text = $vars['text'];
+
+  unset($vars['tag']);
+  unset($vars['text']);
+
+  $vars['toogle'] = 'tooltip';
+  $data_attrs = array('toogle' => 1, 'placement' => 1);
+
+  $output = $otag;
+  foreach ($vars as $key => $value) {
+    if (!empty($data_attrs[$key])) {
+      $output .= $value ? ' data-' . $key . '="' . $value . '"' : '';
+    }
+    else {
+      $output .= $value ? ' ' . $key . '="' . $value . '"' : '';
+    }
+  }
+  $output .= '>' . $text . $ctag;
+  $output .= '<script type="text/javascript">jQuery("#' . $vars['id'] . '").tooltip();</script>';
+
+  return $output;
+}
+
+/**
+ * Theme function for shortcode tooltip tip.
+ */
+function wee_shortcode_tooltip_tip($format, $long) {
+  $output = array();
+  $output[] = '<p><strong>' . t('[tooltip (id="unique id" | class="additional class" | placement="left|top|bottom|right" | title="tooltip text" | tag="tag")]text[/tooltip]') . '</strong> </p>';
+
+  return implode(' ', $output);
+}
+
+/**
+ * Theme for collapse tip.
+ */
+function wee_shortcode_collapse_tip($format, $long) {
+  $output = array();
+  $output[] = '<strong>' . t('[collapse][/collapse]') . '</strong> ';
+
+  return implode(' ', $output);
+}

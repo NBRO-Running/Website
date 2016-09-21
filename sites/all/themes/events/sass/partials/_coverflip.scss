@@ -1,0 +1,84 @@
+/* cover flip */
+.ui-jcoverflip {
+	height: 570px;
+	width: 100%;
+    overflow: hidden;
+}
+.item-list .ui-jcoverflip .title {
+	display: none !important;
+}
+.ui-jcoverflip--item {
+	background-color: #2f2f2f;
+	height: 90%;
+	margin: 0 !important;
+	width: 33.333%;
+	bottom: auto !important;
+	top: 5%;
+	z-index: 1;
+	img {
+		width: 100% !important;
+	}
+	&.views-row-1 {
+		left: 0;
+	}
+	.views-field-view-node {
+		a {
+			background-color: #474646;
+			color: #fff;
+			@include btn;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+			&:after {
+				content: "\f178";
+			}
+			&:hover {
+				background-color: $primary-color;
+			}
+		}
+	}
+}
+
+.ui-jcoverflip--item.active{
+	height: 100%;
+	top: 0;
+	@include box-shadow(0 0 4px #111);
+	z-index: 3;
+}
+
+.front-coverflip {
+	position: relative;
+	padding: 30px;
+	height: 100%;
+	.views-field-field-image {
+		margin: -30px -30px 20px;
+	}
+	.views-field-title {
+		font-size: $fontsize-25;
+		@include title-font-md;
+		line-height: 1;
+	}
+	.views-field-view-node {
+		margin-bottom: 0;
+	}
+}
+
+.view-footer {
+	margin: 0 auto;
+	width: 70%;
+	.ui-slider {
+		background: #272727;
+		border: none;
+		height: 7px;
+		margin: 40px 0 0;
+		width: 100%;
+		.ui-slider-handle {
+			background: #fff;
+			border: none;
+			height: 7px;
+			top: 0;
+			margin-left: -50px;
+			width: 100px;
+		}
+	}
+}

@@ -1,0 +1,22 @@
+.commerce-user-orders {
+	overflow-y: auto;
+}
+.views-table {
+	width: 100%;
+	th, td {
+		padding: 5px 10px;
+		a {
+			white-space: nowrap;
+		}
+	}
+}
+
+.speakers-views {
+	.col-inner {
+		&:hover {
+			.speakers-info {
+				top: 20%;
+			}
+		}
+	}
+}

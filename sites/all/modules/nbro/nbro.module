@@ -1,0 +1,599 @@
+<?php
+
+use Facebook\FacebookSession;
+use Facebook\FacebookRedirectLoginHelper;
+use Facebook\FacebookSDKException;
+use Facebook\FacebookRequest;
+use Facebook\FacebookRequestException;
+use Facebook\GraphObject;
+use MetzWeb\Instagram\Instagram;
+use MetzWeb\Instagram\InstagramException;
+
+function nbro_menu(){
+	$items = array();
+	$items['nbro/instagram'] = array(
+		'title' => 'Instagram Magic',
+		'page callback' => 'nbro_instagram_login',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+		);
+	$items['nbro/instagram/import'] = array(
+		'title' => 'Instagram Magic Import',
+		'page callback' => 'nbro_instagram_import',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+		);
+	$items['nbro/app/colors'] = array(
+		'title' => 'NBRO App COLORS',
+		'page callback' => 'nbro_app_colors',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+		);
+	$items['user/register'] = array(
+		'title' => 'Register',
+		'access callback' => FALSE,
+		'type' => MENU_CALLBACK,
+		);
+
+	return $items;
+}
+
+function nbro_menu_alter(&$items) {
+	// Hide the "Create new account" tab
+	$items['user/register']['type'] = MENU_CALLBACK;
+	$items['user/register']['access callback'] = FALSE;
+}
+
+function nbro_app_colors(){
+	return drupal_json_output(array('race' => '#FFFFFF', 'training' => '#FF00FF', 'other' => '#0000FF'));
+}
+
+/**
+ * This hook allows other modules to add permissions to $scope array
+ *
+ * $scope[] = 'email' is added automatically by simple_fb_connect
+ * Please note that if your app requires some additional permissions, you may
+ * have to submit your Facebook App to Facebook Review process
+ *
+ * Read more about FB review process:
+ * https://developers.facebook.com/docs/apps/review/login
+ *
+ * @param $scope
+ *   The scope array listing the permissions requested by the app
+ *
+ * @return
+ *   The updated scope array
+ */
+function nbro_simple_fb_connect_scope_info($scope) {
+  // Implement this hook in your own module to add items to $scope array
+  $scope[] = 'rsvp_event';
+
+  return $scope;
+}
+
+function nbro_instagram_login() {
+	require_once("Instagram.php");
+
+	$instagram = new Instagram(array(
+				'apiKey'      => 'cff4b705586a43618f5236aca8174a95',
+				'apiSecret'   => '7e992968b5614290b62f2e0bfb81d4b2',
+				'apiCallback' => 'https://www.nbrorunning.com/nbro/instagram'
+				));
+
+	if(isset($_GET['code'])){
+		$code = $_GET['code'];
+
+		//Get the token. 
+		$data = $instagram->getOAuthToken($code);
+
+		variable_set('nbro_instagram_token', $data->access_token);
+		
+		echo "Login Complete";
+
+	}else{
+
+		echo "<a href='{$instagram->getLoginUrl()}'>Login with Instagram</a>";
+	}
+}
+
+function nbro_instagram_import(){
+	require_once("Instagram.php");
+
+	$instagram = new Instagram(array(
+				'apiKey'      => 'cff4b705586a43618f5236aca8174a95',
+				'apiSecret'   => '7e992968b5614290b62f2e0bfb81d4b2',
+				'apiCallback' => 'https://www.nbrorunning.com/nbro/instagram/import'
+				));
+	$data = variable_get('nbro_instagram_token');
+	// store user access token
+	$instagram->setAccessToken($data);
+
+	// now you have access to all authenticated user methods
+	$results = $instagram->getUserMedia('self');
+
+	do {
+		foreach($results->data as $media){
+
+			if ($media->type === 'video') {
+				continue;
+			}else {
+				//Create empty node object
+				$node = new stdClass();
+				$node->title = $media->id;
+				$node->type = "instagram_photos";
+
+				$efq = new EntityFieldQuery();
+				$result = $efq->entityCondition('entity_type', 'node')
+					->propertyCondition('title', $node->title)
+					->execute();
+
+				if (!empty($result['node'])) {
+					continue;
+				}
+				//Create Node
+				node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+				$node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+				$node->uid = 1; 
+				$node->status = 1; //(1 or 0): published or not
+				$node->promote = 0; //(1 or 0): promoted to front page
+				$node->comment = 0; // 0 = comments disabled, 1 = read only, 2 = read/write
+
+				$node->body[LANGUAGE_NONE][0]['value'] = nbro_removeEmoji($media->caption->text);
+				$image = $media->images->standard_resolution->url;
+				$destination = file_default_scheme() . '://instagram/'.substr($image, strrpos($image, '/') + 1); 
+
+					if ($file = system_retrieve_file($image, $destination, TRUE, FILE_EXISTS_REPLACE)) {
+
+						// Assign the file object to the node, as an array
+						$node->field_image[LANGUAGE_NONE][0] = (array) $file; 
+					}
+					else {
+						watchdog(
+								'nbro',
+								'Could not save instagram picture. Check that directory is writeable: @destination or @host is correct',
+								array('@destination' => $destination, '@host' => $image),
+								WATCHDOG_ERROR
+							);
+					}
+				$node = node_submit($node);
+				node_save($node);
+			}
+		}
+		$results = $instagram->pagination($result);
+	}while($results);
+}
+
+function nbro_removeEmoji($text) {
+
+    $clean_text = "";
+
+    // Match Emoticons
+    $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
+    $clean_text = preg_replace($regexEmoticons, '', $text);
+
+    // Match Miscellaneous Symbols and Pictographs
+    $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
+    $clean_text = preg_replace($regexSymbols, '', $clean_text);
+
+    // Match Transport And Map Symbols
+    $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
+    $clean_text = preg_replace($regexTransport, '', $clean_text);
+
+    // Match Miscellaneous Symbols
+    $regexMisc = '/[\x{2600}-\x{26FF}]/u';
+    $clean_text = preg_replace($regexMisc, '', $clean_text);
+
+    // Match Dingbats
+    $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
+    $clean_text = preg_replace($regexDingbats, '', $clean_text);
+
+    //Remove everything else
+    $clean_text = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $clean_text);
+
+    //Remove underline
+    $clean_text = preg_replace('/_/', '', $clean_text);
+
+    return $clean_text;
+}
+
+/**
+ * This hook allows other modules to change $fields array before new user is created.
+ *
+ * @param $fields
+ *   The fields array to be stored with user profile in user_save.
+ *   Modify these values with values from $fb_user_profile to populate
+ *   User Profile with values from FB while creating new user.
+ *
+ * @param $fb_user_profile
+ *   Facebook GraphObject representing the user (response to "/me" API request)
+ *   See: https://developers.facebook.com/docs/php/GraphObject/4.0.0
+ *
+ */
+function nbro_simple_fb_connect_register_alter(&$fields, $fb_user_profile) {
+  // Implement this hook in your own module to modify $fields array
+
+  $user_token = $_SESSION['simple_fb_connect']['user_token'];
+
+  $fb_session = new FacebookSession($user_token);
+  $fb_session->validate();
+
+  $request = new FacebookRequest($fb_session, 'GET', '/me?fields=id,name,email,gender');
+  $object = $request->execute()->getGraphObject();
+
+  $fields['field_gender'][LANGUAGE_NONE][0]['value'] = ucfirst($object->getProperty('gender'));
+  $fields['field_facebook_userid'][LANGUAGE_NONE][0]['value'] = $object->getProperty('id');
+
+}
+
+
+/**
+ * This hook allows other modules to act on Facebook login.
+ *
+ * This is an alternative for the Rules event if you don't want to
+ * use Rules module.
+ *
+ * @param $drupal_user
+ *   Fully loaded Drupal user object
+ */
+function nbro_simple_fb_connect_login($drupal_user) {
+	// Implement this hook in your own module to act on Facebook login
+
+	// Event managers have access to get events from Facebook.  
+	if(in_array('administrator', $drupal_user->roles)){
+
+		// Get events for NBRO
+		// If you want to make queries to Facebook API, you can get the
+		// FacebookSession for the current user as follows:
+		$user_token = $_SESSION['simple_fb_connect']['user_token'];
+   		variable_set('nbro_facebook_session', $user_token);
+	}
+}
+
+function nbro_cron(){
+	$user_token = variable_get('nbro_facebook_session');
+	$lastrun = variable_get('nbro_cron');
+
+	watchdog(
+			'nbro',
+			'NBRO Cron run.',
+			array(),
+			WATCHDOG_INFO
+		);
+
+	simple_fb_connect_initialize();	
+	nbro_calculate_stats();
+
+	//Only run cron every hour. 
+	if(_nbro_create_events($user_token)){
+		variable_set('nbro_cron', time());
+	}
+
+	//_nbro_connect_attendees_to_users();
+
+	nbro_instagram_import();
+}
+
+function _nbro_connect_attendees_to_users(){
+
+	//Get all connected users. 
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'event_attendees')
+		->fieldCondition('field_user', 'target_id', 1, '=');
+	$result = $query->execute();
+
+	foreach($result['node'] as $key => $node){
+
+		$node = node_load($key);
+		$fb_userid = $node->field_facebook_userid[LANGUAGE_NONE][0]['value'];
+
+		$user = db_query("SELECT entity_id FROM field_data_field_facebook_userid WHERE entity_type = :entity AND field_facebook_userid_value = :fb_userid ", array(':fb_userid' => $fb_userid, ':entity' => 'user'));
+
+
+		if($uid = $user->fetchColumn(0)){
+			$node->field_user[LANGUAGE_NONE][0]['target_id'] = $uid;
+			node_save($node);
+		}
+
+	}
+}
+
+function _nbro_create_events($user_token){
+
+
+	variable_set('nbro_facebook_session', $user_token);
+	$fb_session = new FacebookSession($user_token);
+	$fb_session->validate();
+
+	//Send request and get events three months out in the future. 
+	$events = _nbro_facebook_get_events($fb_session);
+
+	foreach($events as $event){
+
+		//Create empty node object
+		$node = new stdClass();
+		$node->title = $event->name;
+		$node->type = "event";
+
+		//Get fields
+		$cover = $event->cover;
+		$fb_id = $event->id;
+
+		//Check if we have the node in the system and update the node if we do. 
+		$efq = new EntityFieldQuery();
+		$result = $efq->entityCondition('entity_type', 'node')
+			->fieldCondition('field_facebook_id', 'value', $fb_id, '=')
+			->execute();
+		if (!empty($result['node'])) {
+			$nids = array_keys($result['node']);
+			// Do something with the Node IDs here.
+			$node = node_load($nids[0]);
+		}
+
+		//Create Nod
+		node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+		$node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+		$node->uid = 1; 
+		$node->status = 1; //(1 or 0): published or not
+		$node->promote = 0; //(1 or 0): promoted to front page
+		$node->comment = 0; // 0 = comments disabled, 1 = read only, 2 = read/write
+
+		if($training_type = _get_event_training_type($event->name)){
+			$node->field_training_type[LANGUAGE_NONE][0]['value'] = $training_type;
+			$filepath = 'https://www.nbrorunning.com/sites/default/files/event_covers_default/'.$training_type.".jpg";
+		}else {
+			$filepath = $event->cover->source;
+		}
+
+		$destination = file_default_scheme() . '://event_covers/'.$event->id.".jpg"; 
+
+		if ($file = system_retrieve_file($filepath, $destination, TRUE, FILE_EXISTS_REPLACE)) {
+			// Assign the file object to the node, as an array
+			$node->field_event_image[LANGUAGE_NONE][0] = (array) $file; 
+			$node->field_slideshow[LANGUAGE_NONE][0] = (array) $file; 
+		}
+		else {
+			watchdog(
+					'nbro',
+					'Could not save FB picture. Check that directory is writeable: @destination or @host is correct',
+					array('@destination' => $destination, '@host' => $filepath),
+					WATCHDOG_ERROR
+				);
+		}
+
+		//Save extra fields. 
+		$node->body[LANGUAGE_NONE][0]['value'] = $event->description;
+		$node->field_facebook_id[LANGUAGE_NONE][0]['value'] = $fb_id;
+		$node->field_date[LANGUAGE_NONE][0]['value'] = date('Y-m-d H:i:s', strtotime($event->start_time));
+		$node->field_time[LANGUAGE_NONE][0]['value'] = date('H:i', strtotime($event->start_time));
+
+		$countries = country_get_list();
+
+		//If event has location, we save it. 		
+		if(isset($event->place->location)){
+			$country_code = array_search($event->place->location->country, $countries);
+			$address = array(
+				'country' => $country_code,
+				'locality' => $event->place->location->city,
+				'postal_code' => $event->place->location->zip,
+				'thoroughfare' => $event->place->location->street,
+			);
+			$node->field_address[LANGUAGE_NONE][0] = $address;
+		}
+
+		$node->field_location[LANGUAGE_NONE][0]['value'] = $event->place->name;
+		
+		//Get Interest Counts and Attending
+		$node->field_facebook_attendees[LANGUAGE_NONE][0]['value'] = (String) $event->attending_count;
+		$node->field_facebook_interest[LANGUAGE_NONE][0]['value'] = (String) $event->interested_count;
+
+		//All races start with NBRO //
+		if(strpos(strtolower($event->name), 'nbro //') !== false){
+			$node->field_race[LANGUAGE_NONE][0]['value'] = 1;
+		}
+	
+		$node = node_submit($node);
+		node_save($node);
+
+		$nid = $node->nid;
+		$attendees = _nbro_get_event_attendees($fb_session, $fb_id);
+
+		foreach($attendees as $key => $attendee){
+			
+			//Create empty node object
+			$node = new stdClass();
+			$node->title = $event->name." - ".$attendee->name;
+			$node->type = "event_attendees";
+
+			$efq = new EntityFieldQuery();
+			$result = $efq->entityCondition('entity_type', 'node')
+				->propertyCondition('title', $node->title)
+				->execute();
+			if (!empty($result['node'])) {
+				continue;
+			}
+			$node->field_facebook_userid[LANGUAGE_NONE][0]['value'] = $attendee->id;
+			$node->field_facebook_id[LANGUAGE_NONE][0]['value'] = $fb_id;
+			$node->field_event[LANGUAGE_NONE][0]['nid'] = $nid;
+			$node->field_user[LANGUAGE_NONE][0]['uid'] = 1;
+			
+			//Create Nod
+			node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+			$node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+			$node->uid = 1; 
+			$node->status = 1; //(1 or 0): published or not
+			$node->promote = 0; //(1 or 0): promoted to front page
+			$node->comment = 0; // 0 = comments disabled, 1 = read only, 2 = read/write
+
+			$node = node_submit($node);
+			node_save($node);
+		}
+
+		//Get Facebook Event Photos
+		$photos = _nbro_get_event_photos($fb_session, $fb_id);
+
+		foreach($photos as $photo){
+			//Create empty node object
+			$node = new stdClass();
+			$node->title = $event->name." - ".$photo->id;
+			$node->type = "event_photos";
+
+			$efq = new EntityFieldQuery();
+			$result = $efq->entityCondition('entity_type', 'node')
+				->propertyCondition('title', $node->title)
+				->execute();
+			if (!empty($result['node'])) {
+				continue;
+			}
+			
+			$request = new FacebookRequest($fb_session, 'GET', '/'.$photo->id.'/?fields=images,id');
+
+			$graphEdge = $request->execute()->getGraphObject()->getProperty('images')->asArray();
+
+			foreach($graphEdge as $photo_element){
+				$filepath = $photo_element->source;
+				$destination = file_default_scheme() . '://event_photos/'.substr($filepath, strrpos($filepath, '/') + 1); 
+
+					if ($file = system_retrieve_file($filepath, $destination, TRUE, FILE_EXISTS_REPLACE)) {
+
+						// Assign the file object to the node, as an array
+						$node->field_image[LANGUAGE_NONE][0] = (array) $file; 
+					}
+				break;
+			}
+
+			$node->field_event[LANGUAGE_NONE][0]['nid'] = $nid;
+			
+			//Create Node
+			node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+			$node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+			$node->uid = 1; 
+			$node->status = 1; //(1 or 0): published or not
+			$node->promote = 0; //(1 or 0): promoted to front page
+			$node->comment = 0; // 0 = comments disabled, 1 = read only, 2 = read/write
+
+			$node = node_submit($node);
+			node_save($node);
+		}
+	}
+}
+
+function _nbro_get_event_photos($fb_session, $eventid){
+
+	$photos = array();
+	$request = new FacebookRequest(
+			$fb_session,
+			'GET',
+			'/'.$eventid.'/photos'
+			);
+	
+	do {
+		$response = $request->execute();
+		$graphObject = $response->getGraphObject();
+		$some_photos = $graphObject->getProperty('data')->asArray();
+		$photos = array_merge($photos, $some_photos);
+	} while ($request = $response->getRequestForNextPage());
+
+	return $photos;
+}
+
+function _nbro_facebook_get_events($fb_session){
+
+	$events = array();
+
+        $request = new FacebookRequest($fb_session, 'GET', '/108900355842020/events?fields=cover,description,name,id,start_time,end_time,timezone,attending_count,interested_count,place&since=now&until='.strtotime("+6 months", time()));
+
+
+	do {
+		$response = $request->execute();
+		$graphObject = $response->getGraphObject();
+		$some_events = $graphObject->getProperty('data')->asArray();
+		$events = array_merge($events, $some_events);
+	} while ($request = $response->getRequestForNextPage());
+
+	return $events;
+}
+
+
+
+function _nbro_get_event_attendees($fb_session, $eventid){
+
+	$attending = array();
+	$request = new FacebookRequest(
+			$fb_session,
+			'GET',
+			'/'.$eventid.'/attending'
+			);
+	
+	do {
+		$response = $request->execute();
+		$graphObject = $response->getGraphObject();
+		$some_attending = $graphObject->getProperty('data')->asArray();
+		$attending = array_merge($attending, $some_attending);
+	} while ($request = $response->getRequestForNextPage());
+
+	return $attending;
+}
+
+function nbro_get_facebook_group_photos($user_session){
+
+	return true;
+}
+
+
+//Return training type based on name
+function _get_event_training_type($name) {
+	if(strpos(strtolower($name), 'monday') !== false){
+		return 'Bloody Monday';
+	}elseif (strpos(strtolower($name), 'mellow') !== false){
+		return 'Mellow Tuesday';
+	}elseif (strpos(strtolower($name), 'poet') !== false){
+		return 'Dead Poets Tuesday';
+	}elseif (strpos(strtolower($name), 'midweek') !== false){
+		return 'Midweek Madness';
+	}elseif (strpos(strtolower($name), 'eight') !== false){
+		return 'After Eight';
+	}elseif (strpos(strtolower($name), 'trappe') !== false){
+		return 'Trappetræning';
+	}elseif (strpos(strtolower($name), 'tech') !== false){
+		return 'Tech Thursday';
+	}elseif (strpos(strtolower($name), 'long') !== false){
+		return 'Long Saturday';
+	}elseif (strpos(strtolower($name), 'muddy') !== false){
+		return 'Muddy Sunday';
+	}elseif (strpos(strtolower($name), 'rookie') !== false){
+		return 'Rookie Tours';
+	}elseif (strpos(strtolower($name), 'knock') !== false){
+		return 'Knock Off Friday';
+	}elseif (strpos(strtolower($name), 'wake') !== false){
+		return 'Wakeup';
+	}else {
+		return false;
+	}
+}
+
+function nbro_calculate_stats() {
+
+	$all_fields_on_my_website = field_info_fields();
+	$event_types= list_allowed_values($all_fields_on_my_website["field_training_type"]);
+
+	foreach($event_types as $key => $type ){
+		$result = db_query("
+			SELECT 
+				ROUND(AVG(fdi.field_facebook_interest_value)) as interest,
+				ROUND(AVG(fda.field_facebook_attendees_value)) as attending
+			 FROM {field_data_field_training_type} fdt
+			 INNER JOIN {field_data_field_facebook_interest} fdi
+			 ON fdt.entity_id = fdi.entity_id
+			 INNER JOIN {field_data_field_facebook_attendees} fda
+			 ON fdt.entity_id = fda.entity_id
+			 WHERE fdt.field_training_type_value = :type", array(':type' => $type));
+
+		$record = $result->fetchObject();
+		variable_set('nbro_stat_attending_'.strtolower(str_replace(' ', '', $type)), $record->attending);
+		variable_set('nbro_stat_interest_'.strtolower(str_replace(' ', '', $type)), $record->interest);
+		
+	}
+}
+
+?>

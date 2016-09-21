@@ -1,0 +1,1059 @@
+<?php
+
+/**
+ * Distributed under GNU GPL version 3
+ * @file
+ *  Will create menu administration links and the public block display
+ *  Required for creating and viewing the available weebpal banners
+ */
+
+/**
+ * Module Defaults
+ */
+define('BANNER_DEFAULT_OUTPUT',        'urltext');
+define('BANNER_DEFAULT_ERROR',         FALSE);
+define('BANNER_DEFAULT_BLOCK_NAME',    'weebpal_banner_block');
+define('BANNER_DEFAULT_SAVE_LOCATION', 'public://field/banners/');
+define('BANNER_DEFAULT_BANNER_MODE',   'normal');
+
+
+/**
+ * Hook Functions (Drupal)
+ */
+
+/**
+ * Implements hook_permission().
+ * Permissions for weebpal banner
+ */
+function weebpal_banner_permission() {
+  return array(
+    'administer weebpal banner' => array(
+      'title'       => t('administer weebpal banner'),
+      'description' => t('Allows a user to change what banners are displayed within the weebpal Banner display.'),
+    ),
+  );
+}// end permission function
+
+
+/**
+ * Implements hook_menu().
+ * it is key to note here access arguments is referring to permissions
+ */
+function weebpal_banner_menu() {
+  $items = array();
+
+  // This is the root path and will be used to add weebpal banner to the admin page
+  $items['admin/structure/banners'] = array(
+    'title'            => 'Weebpal Banner',
+    'description'      => 'Configure the Weebpal Banner.',
+    'page callback'    => 'weebpal_banner_admin_page',
+    'access arguments' => array('administer weebpal banner'),
+  );
+  // The weebpal banner module settings page
+  $items['admin/structure/banners/settings'] = array(
+    'title'            => 'Settings',
+    'description'      => 'A page for the weebpal banner settings',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('weebpal_banner_settings'),
+    'access arguments' => array('administer weebpal banner'),
+    'type'             => MENU_LOCAL_ACTION,
+  );
+  // This will be the page to delete a selected banner
+  $items['admin/structure/banners/delete/%'] = array(
+    'title'            => 'Delete Banner',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('weebpal_banner_admin_delete_confirm'),
+    'access arguments' => array('administer weebpal banner'),
+  );
+  // the defaulted page to load on menu click
+  $items['admin/structure/banners/list'] = array(
+    'title'            => 'List Banners',
+    'weight'           => -10,
+  );
+
+  /**
+   * These next three are the same destination but since we want the user to know
+   * We add them to the menu deal with logic from inside the form
+   */
+  $items['admin/structure/banners/add/0'] = array(
+    'title'            => 'Add Banner',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('weebpal_banner_admin_form'),
+    'access arguments' => array('administer weebpal banner'),
+    'type'             => MENU_LOCAL_ACTION,
+  );
+  $items['admin/structure/banners/default'] = array(
+    'title'            => 'Default Banner',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('weebpal_banner_admin_form'),
+    'access arguments' => array('administer weebpal banner'),
+    'type'             => MENU_LOCAL_ACTION,
+  );
+  // This will be the page to edit a banner from a form
+  $items['admin/structure/banners/edit/%'] = array(
+    'title'            => 'Edit Banner',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('weebpal_banner_admin_form'),
+    'access arguments' => array('administer weebpal banner'),
+  );
+
+  return $items;
+}// end menu function
+
+
+/**
+ * Implements hook_theme().
+ * Theme template used in module.
+ */
+function weebpal_banner_theme() {
+  $theme = array(
+    'banner_output' => array(
+      'variables' => array(
+        'url'             => NULL,
+        'text'            => NULL,
+        'link'            => NULL,
+        'display_setting' => NULL,
+        'display_errors'  => NULL,
+      ),
+      'template'  => 'banner_output',
+    ),
+  );
+
+  return $theme;
+}// end theme function
+
+
+/**
+ * Implements hook_block_info().
+ */
+function weebpal_banner_block_info() {
+  $blocks = array();
+
+  $blocks[BANNER_DEFAULT_BLOCK_NAME] = array(
+    'info'  => t('The default display of Weebpal Banner'),
+    // This will mean that on every page new code will be run
+    'cache' => DRUPAL_CACHE_PER_PAGE,
+  );
+
+  return $blocks;
+}// End block info
+
+/**
+ * Implements hook_block_view()
+ */
+function weebpal_banner_block_view($delta) {
+  if ($delta == BANNER_DEFAULT_BLOCK_NAME) {
+    // Store the path of the page the block is loading from, this will seed our first searches
+    $system_path = current_path();
+    $path = drupal_get_path_alias($system_path);
+    // Loop until we find the top down hirarchy
+    do {
+      $result = NULL;
+      // Exact match section //
+      // Create and execute query
+      $query = db_select('weebpal_banner', 'd');
+      $query->condition('d.path', $path, '=')
+        ->fields('d');
+      $result = $query->execute()->fetchObject();
+      // Search for that path string exact match
+      if ($result) {
+        // We have to translate if we have fids
+        // Image should always be in path format (sites/default/banners/pic0.jpg,sites/default/banners/pic1.jpg)
+        $image = weebpal_banner_image_handler($result->imgurl, $result->imgfid);
+        $variables = array(
+            'url'             => $image,
+            'text'            => $result->text,
+            'link'            => $result->link,
+            'display_setting' => variable_get('weebpal_banner_display_setting', BANNER_DEFAULT_OUTPUT),
+            'display_errors'  => variable_get('weebpal_banner_display_errors', BANNER_DEFAULT_ERROR));
+        return array('content' => theme('banner_output', $variables));
+      }
+
+      // Wild section //
+      $result = NULL;
+      $wild_search = $path . '*';
+
+      // Create and execute query
+      $query = db_select('weebpal_banner', 'd');
+      $query->condition('d.path', $wild_search, '=')
+        ->fields('d');
+      $result = $query->execute()->fetchObject();
+
+      // Search for the wild card string exact match
+      if ($result) {
+        // Have to translate if we have fids
+        // Image should always be in path format (sites/default/banners/pic0.jpg,sites/default/banners/pic1.jpg)
+        $image = weebpal_banner_image_handler($result->imgurl, $result->imgfid);
+        $variables = array(
+          'url'             => $image,
+          'text'            => $result->text,
+          'link'            => $result->link,
+          'display_setting' => variable_get('weebpal_banner_display_setting', BANNER_DEFAULT_OUTPUT),
+          'display_errors'  => variable_get('weebpal_banner_display_errors', BANNER_DEFAULT_ERROR));
+        return array('content' => theme('banner_output', $variables));
+      }
+
+      // Random section //
+      $result = NULL;
+      $random_search = $path . '!';
+
+      // Create and execute query
+      $query = db_select('weebpal_banner', 'd');
+      $query->condition('d.path', $random_search, '=')
+        ->fields('d');
+      $result = $query->execute()->fetchObject();
+
+      // Search for that random string exact match
+      if ($result) {
+        // Get extra stuff associated with randoms
+        $images = weebpal_banner_image_handler($result->imgurl, $result->imgfid);
+        // Support for random text if needed
+        $texts = $result->text;
+        // Explode comma seperated images and text
+        $image = explode(",", $images);
+        // Support for random text if needed
+        $text = explode(",", $texts);
+
+        // Count how many there are
+        $count = count($image);
+
+        // Handle the random with ints (deal with array start at 0 problems)
+        // So if there are 3 elements in the array it is 0-2 not 1-3 so generate random based on that
+        $random = ($count - rand(0, $count - 1)) - 1;
+
+        // Remember text is optional
+        $variables = array(
+          'url'             => $image[$random],
+          'text'            => $text[$random],
+          'link'            => $result->link,
+          'display_setting' => variable_get('weebpal_banner_display_setting', BANNER_DEFAULT_OUTPUT),
+          'display_errors'  => variable_get('weebpal_banner_display_errors', BANNER_DEFAULT_ERROR));
+        return array('content' => theme('banner_output', $variables));
+      }
+
+      // Chop off more of the string and try again, it is key to not modify the path before this point
+      $last_slash_position = strrpos($path, "/"); // returns false if not found
+      if ($last_slash_position !== FALSE) {
+        $path = drupal_substr($path, 0, $last_slash_position);
+      }
+      else {
+        $path = FALSE;
+      }
+
+    } while ($path != FALSE);
+
+    // Well no banner was found for this specific page if we have a default banner then display it
+
+    // TODO: store default banner in the variables table
+    $query = db_select('weebpal_banner', 'd');
+    $query->condition('d.path', 'DEFAULT', '=')
+      ->fields('d');
+    $result = $query->execute()->fetchObject();
+
+    // For the resultant row (SHOULD ALWAYS BE ONE)
+    if ($result) {
+      $image = weebpal_banner_image_handler($result->imgurl, $result->imgfid);
+      $variables = array(
+        'url'             => $image,
+        'text'            => $result->text,
+        'link'            => $result->link,
+        'display_setting' => variable_get('weebpal_banner_display_setting', BANNER_DEFAULT_OUTPUT),
+        'display_errors'  => variable_get('weebpal_banner_display_errors', BANNER_DEFAULT_ERROR),
+      );
+      return array('content' => theme('banner_output', $variables));
+    }
+    // Just in case something went wrong
+  }
+}// End block view
+
+/**
+ * Return a listing of all defined URL aliases.
+ * When filter key passed, perform a standard search on the given key,
+ * And return the list of matching URL aliases.
+ */
+function weebpal_banner_admin_page() {
+  // Grab the filter if the user set one
+  $filter = weebpal_banner_build_filter_query();
+
+  // Add the filter form above the overview table.
+  $output['weebpal_banner_admin_filter_form'] = drupal_get_form('weebpal_banner_admin_filter_form');
+
+  // Construct the headers of the table
+  $header = array(
+    array(
+      'data'    => t('Url'),
+      'field'   => 'd.path',
+      'sort'    => 'asc',
+    ),
+    array(
+      'data'    => t('ImgUrl'),
+    ),
+    array(
+      'data'    => t('Text'),
+      'field'   => 'd.text',
+    ),
+    array(
+      'data'    => t('Link'),
+      'field'   => 'd.link',
+    ),
+    array(
+      'data'    => t('Mode'),
+      'field'   => 'd.mode',
+    ),
+    array(
+      'data'    => t('Operations'),
+      'colspan' => '2',
+    ),
+  );
+
+  // Contruct the db call for the list
+  // Load all data fields and attach pager and sorter function in
+  $query = db_select('weebpal_banner', 'd')->extend('PagerDefault')->extend('TableSort'); // alias the table name to d
+  $query->fields('d') // Select all fields from the node table.
+    ->limit(20) // Load the first 20 rows.
+    ->orderByHeader($header);
+
+  // Find if the filter has returned a where clause and add it in before executing
+  if (!empty($filter)) {
+    $query->where($filter);
+  }
+  $result = $query->execute();
+
+  // Start constructing the individual rows
+  $rows = array();
+  foreach ($result as $data) {
+    $image = weebpal_banner_image_handler($data->imgurl, $data->imgfid);
+    $rows[] = array('data' =>
+      array(
+        $data->path,
+        $image,
+        $data->text,
+        $data->link,
+        $data->mode,
+        l(t('edit'), "admin/structure/banners/edit/" . $data->dbid),
+        l(t('delete'), "admin/structure/banners/delete/" . $data->dbid)
+      )
+    );
+  }
+
+  // Construct the call for the theme function to run on this
+  $output['weebpal_banner_table'] = array(
+    '#theme'  => 'table',
+    '#header' => $header,
+    '#rows'   => $rows,
+    '#empty'  => t('No Banners Found.'),
+  );
+
+  // Adds the pager buttons to the bottom of the table
+  $output['weebpal_banner_pager'] = array('#theme' => 'pager');
+
+  // Let Drupal handle print and echo
+  return $output;
+}
+
+/**
+ * Needed for the filtering of the banners page
+ */
+function weebpal_banner_build_filter_query() {
+  if (empty($_SESSION['weebpal_banner_filter'])) {
+    return;
+  }
+
+  $filters = weebpal_banner_filters();
+  $conditions = weebpal_banner_filter_conditions();
+  // Build query
+  $where = $args = array();
+  foreach ($_SESSION['weebpal_banner_filter'] as $key => $filter) {
+    $filter_where = array();
+    foreach ($filter as $value) {
+      $condition = $conditions[$value];
+      // If condition contains AND, then replace AND with AND d.path
+      $condition = preg_replace('/AND/', 'AND d.path ', $condition);
+      $filter_where[] = $filters[$key]['where'] . ' ' . $condition;
+    }
+    if (!empty($filter_where)) {
+      $where = implode(' OR ', $filter_where);
+    }
+  }
+  return $where;
+}
+
+/**
+ * The specific filters that can be used for banners
+ */
+function weebpal_banner_filters() {
+  $filters = array();
+  $conditions = weebpal_banner_filter_conditions();
+  $filters['type'] = array(
+    'title'   => t('Type'),
+    'where'   => "d.path",
+    'options' => $conditions,
+  );
+  return $filters;
+}
+
+/**
+ * The specific filter condition that can be used for banners
+ *
+ * @return
+ *  Filter Conditions.
+ */
+function weebpal_banner_filter_conditions() {
+  $conditions = array("NOT LIKE '%*%' AND NOT LIKE '%!%'", "LIKE '%*%'", "LIKE '%!%'");
+  return $conditions;
+}
+
+/**
+ * Return a form to filter Banners.
+ *
+ * ingroup forms
+ * see weebpal_banner_admin_filter_form_submit()
+ */
+function weebpal_banner_admin_filter_form($form) {
+  $filters = weebpal_banner_filters();
+
+  $form['filters'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Filter weebpal banner'),
+    '#collapsible' => TRUE,
+    '#collapsed'   => empty($_SESSION['weebpal_banner_filter']),
+  );
+
+  foreach ($filters as $key => $filter) {
+    $form['filters']['status'][$key] = array(
+      '#title'     => $filter['title'],
+      '#type'      => 'select',
+      '#multiple'  => TRUE,
+      '#size'      => 8,
+      '#options'   => $filter['options'],
+    );
+    if (!empty($_SESSION['weebpal_banner_filter'][$key])) {
+      $form['filters']['status'][$key]['#default_value'] = $_SESSION['weebpal_banner_filter'][$key];
+    }
+  }
+
+  $form['filters']['actions'] = array(
+    '#type'        => 'actions',
+    '#attributes'  => array('class' => array('container-inline')),
+  );
+  $form['filters']['actions']['submit'] = array(
+    '#type'        => 'submit',
+    '#value'       => t('Filter'),
+  );
+  if (!empty($_SESSION['weebpal_banner_filter'])) {
+    $form['filters']['actions']['reset'] = array(
+      '#type'      => 'submit',
+      '#value'     => t('Reset'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Validate result from weebpal banner administrative filter form.
+ */
+function weebpal_banner_admin_filter_form_validate($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Filter') && empty($form_state['values']['type'])) {
+    form_set_error('type', t('You must select something to filter by.'));
+  }
+}
+
+/**
+ * Process result from weebpal banner administrative filter form.
+ */
+function weebpal_banner_admin_filter_form_submit($form, &$form_state) {
+  $op = $form_state['values']['op'];
+  $filters = weebpal_banner_filters();
+  switch ($op) {
+    case t('Filter'):
+      foreach ($filters as $name => $filter) {
+        if (isset($form_state['values'][$name])) {
+          $_SESSION['weebpal_banner_filter'][$name] = $form_state['values'][$name];
+        }
+      }
+      break;
+
+    case t('Reset'):
+      $_SESSION['weebpal_banner_filter'] = array();
+      break;
+
+  }
+  return 'admin/structure/banners/list/';
+}
+
+/**
+ * Process filter form submission when the Reset button is pressed.
+ */
+function weebpal_banner_admin_filter_form_submit_reset($form, &$form_state) {
+  $form_state['redirect'] = 'admin/structure/banners/list';
+}
+
+/**
+ * The main form dealing with weebpal banner
+ * There is now only one form for weebpal banner to deal with unlink in the d6 version
+ *
+ * INPUT: arg(4) is from the url path of this form
+ */
+function weebpal_banner_admin_form($form, &$form_state) {
+  $dbid = arg(4); // The last portion of the url there must be a better way of doing this
+
+  // This is used by the file handler, It is needed to accept files
+  $form['#attributes'] = array('enctype' => "multipart/form-data");
+
+  $file_path = drupal_get_path('module', 'file');
+
+  // Default the variables here
+  $banner = NULL; // Prevent bugs nulify the variable
+  $default_flag = FALSE; // Enable variable in this scope
+
+  // Hide it so that the user may not change this element
+  $form['dbid'] = array(
+    '#type'          => 'hidden',
+    '#required'      => FALSE,
+  );
+
+  // This needs to be set to something as this is pulled in from the url so we need to parse for 0 for new banners
+  if ($dbid == 0) {
+    // This will disable the path field for the default banner
+    if (strrpos($_GET['q'], "/default")) {
+      drupal_set_title(t('Default Banner'));
+      // Load the default if there is one
+      $banner = weebpal_banner_find_load_default();
+    }
+    else {
+      drupal_set_title(t('New Banner'));
+      $form['dbid']['#value'] = NULL;
+    }
+  }
+  else {
+    // The dbid is set so a banner must exist load it
+    $banner = weebpal_banner_load_banner($dbid);
+    drupal_set_title(t("Edit Banner") . " '" . $banner->path . "'");
+    $form['dbid']['#value'] = $dbid;
+  }
+
+  // This will prevent the used from changing this field once the default has been loaded
+  // It deals with a bug if the person chose to edit the specific banner for default rather than pressing default
+  if ($banner && $banner->path == 'DEFAULT') {
+    $default_flag = TRUE;
+  }
+
+  // Disable the path form element when the default flag is out
+  if (!$default_flag) {
+    $form['path'] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Banner Path'),
+      '#default_value' => $banner ? $banner->path : "",
+      '#size'          => 45,
+      '#maxlength'     => 250,
+      '#description'   => t('Specify an existing url path you wish to put a banner on. For example: home, user* (wild card), content! (random). Enter a path as it appears in the url of your site.'),
+      '#field_prefix'  => url(NULL, array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q='),
+      '#required'      => TRUE,
+    );
+  }
+  else {
+    $form['path'] = array(
+      '#type'          => 'hidden',
+      '#title'         => t('Banner Path'),
+      '#value'         => 'DEFAULT',
+    );
+  }
+
+  // if the module exists add the autocomplete path
+  // i might have to do my own autocomplete here cause mpac doesnt really do what i need it to do
+  if (module_exists('mpac')) {
+    $form['path']['#autocomplete_path'] = 'mpac/autocomplete/alias';
+  }
+
+  $form['image_type'] = array(
+    '#type'    => 'radios',
+    '#options' => drupal_map_assoc(array(t('Use Existing Image(s)'), t('Upload New Image(s)'))),
+    '#title'   => t('Choose image type.')
+  );
+
+  if ($banner && isset($banner->imgurl)) {
+    $form['image_type']['#default_value'] = t('Use Existing Image(s)');
+  }
+  else {
+    $form['image_type']['#default_value'] = t('Upload New Image(s)');
+  }
+
+  /**
+   * Note: There are two form elements for the same thing
+   * They are both not required but only one is needed for proper handling
+   * When we are loading an old banner load the url into imgurl
+   * When we are uploading a new image the validator will upload the image store it and fill in imgurl for you
+   * Only use one method no mix and matching
+   * When reading the data use checks to see which method was used
+   */
+  $form['imgurl'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Typeout the url of the image'),
+    '#default_value' => $banner ? $banner->imgurl : '',
+    '#description'   => t('Specify an image(s) for the banner to display.'),
+    '#field_prefix'  => url(NULL, array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q='),
+    //'#required'    => TRUE,
+    '#states'        => array(
+      'visible'      => array(
+        ':input[name="image_type"]' => array('value' => t('Use Existing Image(s)')),
+      ),
+    ),
+  );
+
+  /**
+   * Since upon pressing the delete button on the image the fid is set to 0
+   * We need to save it because we still need to delete that image.
+   */
+  $form['oldimagefid'] = array(
+    '#type'          => 'hidden',
+    '#required'      => FALSE,
+    '#value'         => $banner ? $banner->imgfid : '',
+  );
+
+  $form['image'] = array(
+    '#title'              => t('Choose Image File'),
+    '#type'               => 'managed_file',
+    '#default_value'      => $banner ? $banner->imgfid : '',
+    '#attached'           => array(
+      'js'                => array($file_path . '/file.js'),
+     ),
+    '#progress_indicator' => 'throbber',
+    '#progress_message'   => NULL,
+    '#upload_location'    => variable_get('weebpal_banner_file_save_path', BANNER_DEFAULT_SAVE_LOCATION),
+    '#upload_validators'  => array(
+      'file_validate_is_image' => array(),
+      'file_validate_extensions' => array('png gif jpg jpeg'),
+    ),
+    '#description'        => t('Specify an image(s) for the banner to display.'),
+    '#states'             => array(
+      'visible'           => array(
+        ':input[name="image_type"]' => array('value' => t('Upload New Image(s)')),
+      ),
+    ),
+    '#element_validate' => array('weebpal_banner_upload_image_validate'),
+  );
+
+  $form['text'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Text'),
+    '#default_value' => $banner ? $banner->text : '',
+    '#maxlength'     => 250,
+    '#size'          => 45,
+    '#description'   => t('Specify the text to associate with this banner [comma separated for randomizing, also must match amount of elements from images] (optional).'),
+    '#required'      => FALSE,
+  );
+
+  $form['link'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Link'),
+    '#default_value' => $banner ? $banner->link : '',
+    '#maxlength'     => 250,
+    '#size'          => 45,
+    '#description'   => t('Specify the link you want your banner to point to (optional).'),
+    '#required'      => FALSE,
+  );
+
+  $form['mode'] = array(
+    '#type'          => 'radios',
+    '#title'         => t('Mode'),
+    '#options'       => drupal_map_assoc(array(t('normal'), t('time_based'), t('rotating'), t('fade'))),
+    '#default_value' => $banner ? $banner->mode : BANNER_DEFAULT_BANNER_MODE,
+    '#description'   => t('What mode do you want this banner to display under (this is different than display setting)'),
+    '#required'      => TRUE,
+    '#disabled'      => TRUE,
+  );
+  /*
+  $form['time_on'] = array(
+    '#type'          => 'date',
+    '#title'         => t('Start Time'),
+    '#description'   => t('Specify the time you want your banner to start displaying (optional).'),
+    '#required'      => FALSE,
+    '#states'        => array(
+      'visible'      => array(
+        ':input[name="mode"]' => array('value' => t('time_based')),
+      ),
+    ),
+  );
+
+  $form['time_off'] = array(
+    '#type'          => 'date',
+    '#title'         => t('End Time'),
+    '#description'   => t('Specify the time you want your banner to stop displaying (optional).'),
+    '#required'      => FALSE,
+    '#states'        => array(
+      'visible'      => array(
+        ':input[name="mode"]' => array('value' => t('time_based')),
+      ),
+    ),
+  );*/
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Banner'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validate/submit handler used for handling image uploads
+ */
+function weebpal_banner_upload_image_validate($element, &$form_state) {
+  if (!isset($element['#value']['fid']) || empty($element['#value']['fid'])) {
+    form_error($element, t('Please Upload a Image'));
+  }
+
+  $file = file_load($element['#value']['fid']);
+
+  if ($file) {
+    // Get the image info to get the correct extension for the uploaded file.
+    // Change status to permanent.
+    $file->status = FILE_STATUS_PERMANENT;
+
+    // When a module is managing a file, it must manage the usage count.
+    // Here we increment the usage count with file_usage_add().
+    file_usage_add($file, 'weebpal_banner', 'banner', 1);
+
+    // Save the file again for permanent status
+    file_save($file);
+  }
+  else {
+    form_error($element, t('Failed to write the uploaded file to the folder.'));
+  }
+}
+
+/**
+ * Verify that the Banner is valid
+ * It makes sure that the sql does not throw errors
+ */
+function weebpal_banner_admin_form_validate($form, &$form_state) {
+  // For a banner to exist it needs a path that it is assigned to and an image, thats it.
+  if (isset($form_state['values']['path']) &&
+    (isset($form_state['values']['image']) || isset($form_state['values']['imgurl']))) {
+
+    $path = $form_state['values']['path'];
+
+    if ($path != 'DEFAULT') {
+      // Check db before altering the path variable
+      // Check for more than one of the same path banners
+      if (db_query("SELECT COUNT(path) FROM {weebpal_banner} WHERE path = :path", array(':path' => $path))->fetchField() > 1) {
+        form_set_error('path', t('The path %path is already in use.', array('%path' => $path)));
+        return;
+      }
+      // Path is not clean at this point because of wildcard and random must chop those characters off
+      // Find the * or wildcard
+      $wild_position = strrpos($path, "*");
+      if ($wild_position !== FALSE) {
+        $path = drupal_substr($path, 0, $wild_position);
+      }
+      // Find the ! or random
+      $rand_position = strrpos($path, "!");
+      if ($rand_position !== FALSE) {
+        $path = drupal_substr($path, 0, $rand_position);
+      }
+
+
+    }
+  }
+  else {
+    form_set_error('path', t('There was a problem with the required fields please check the form and try again.'));
+    return;
+  }
+}
+
+/**
+ * Save a new Banner to the database
+ */
+function weebpal_banner_admin_form_submit($form, &$form_state) {
+  // Define a sort of struct array for display mode for form translation
+  // Extra validation check to make sure
+  if ($form_state['values']['image_type'] == t('Use Existing Image(s)')) {
+    $imgurl = $form_state['values']['imgurl'];
+  }
+  else {
+    $imgurl = NULL;
+  }
+  if ($form_state['values']['image_type'] == t('Upload New Image(s)')) {
+    $imgfid = $form_state['values']['image']['fid'];
+  }
+  else {
+    $imgfid = NULL;
+  }
+
+  $path     = $form_state['values']['path'];
+  $text     = $form_state['values']['text'];
+  $link     = $form_state['values']['link'];
+  $mode     = $form_state['values']['mode'];
+  //$time_on  = $form_state['values']['time_on'];// these are arrays we need a time handler
+  //$time_off = $form_state['values']['time_off'];
+  $dbid     = $form_state['values']['dbid'];
+
+  $time_on  = NULL;
+  $time_off = NULL;
+
+  // Save the banner
+  weebpal_banner_set_banner($path, $imgurl, $imgfid, $text, $link, $mode, $time_on, $time_off, $dbid);
+
+  drupal_set_message(t('The banner has been saved.'));
+  $form_state['redirect'] = 'admin/structure/banners';
+}
+
+/**
+ * Set a banner for a given path, preventing duplicates.
+ * Note if dbid comes in null then we are creating a banner
+ */
+function weebpal_banner_set_banner($path, $imgurl, $imgfid, $text, $link, $mode = BANNER_DEFAULT_BANNER_MODE, $time_on, $time_off, $dbid = NULL) {
+  // First we check if we are dealing with an existing alias and delete or modify it based on dbid.
+  // We dont need to do a complicated check here because the code already made it for us
+  if ($dbid) {
+    // Update the existing banner.
+    db_update('weebpal_banner')->fields(array(
+      'path'       => drupal_strtolower($path),
+      'imgurl'     => $imgurl,
+      'imgfid'     => $imgfid,
+      'text'       => $text,
+      'link'       => $link,
+      'mode'       => $mode,
+      'start_time' => $time_on,
+      'end_time'   => $time_off,
+    ))->condition('dbid', $dbid)->execute();
+  }
+  else {
+    db_insert('weebpal_banner')->fields(array(
+      'path'       => drupal_strtolower($path),
+      'imgurl'     => $imgurl,
+      'imgfid'     => $imgfid,
+      'text'       => $text,
+      'link'       => $link,
+      'mode'       => $mode,
+      'start_time' => $time_on,
+      'end_time'   => $time_off,
+    ))->execute();
+  }
+}
+
+/**
+ * Menu callback; confirms deleting a Banner
+ */
+function weebpal_banner_admin_delete_confirm($form, $form_state) {
+  // the last part of the url
+  $dbid = arg(4);
+
+  $banner = weebpal_banner_load_banner($dbid);
+  if (user_access('administer weebpal_banner')) {
+    $form['dbid'] = array(
+      '#type'  => 'hidden',
+      '#value' => $dbid,
+    );
+    $output = confirm_form($form,
+      t('Are you sure you want to delete banner %title?', array('%title' => $banner->path)),
+      isset($_GET['destination']) ? $_GET['destination'] : 'admin/structure/banners');
+  }
+  return $output;
+}
+
+/**
+ * Execute banners deletion
+ */
+function weebpal_banner_admin_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    weebpal_banner_admin_delete($form_state['values']['dbid']);
+    $form_state['redirect'] = 'admin/structure/banners';
+    return;
+  }
+}
+
+/**
+ * Post-confirmation; delete a Banner
+ */
+function weebpal_banner_admin_delete($dbid = 0) {
+  db_delete('weebpal_banner')->condition('dbid', $dbid)->execute();
+  drupal_set_message(t('The banner has been deleted, the image still exists however.'));
+}
+
+/**
+ * Fetch a specific banner from the database.
+ */
+function weebpal_banner_load_banner($dbid) {
+  $query = db_select('weebpal_banner', 'd');
+  $query->condition('d.dbid', $dbid, '=')
+    ->fields('d');
+  $result = $query->execute()->fetchObject();
+
+  if ($result) {
+    return $result;
+  }
+  return NULL;
+}
+
+/**
+ * Find the default banner and return all of it's attributes
+ */
+function weebpal_banner_find_load_default() {
+  $query = db_select('weebpal_banner', 'd');
+  $query->condition('d.path', 'DEFAULT', '=')
+    ->fields('d');
+  $result = $query->execute()->fetchObject();
+
+  if ($result) {
+    return $result;
+  }
+
+  // Do not return null for this
+  $blank_banner = new stdClass();
+  $blank_banner->dbid = 0;
+  $blank_banner->path = 'DEFAULT';
+  $blank_banner->imgurl = '';
+  $blank_banner->mode = 'normal';
+  $blank_banner->text = '';
+  $blank_banner->link = '';
+  $blank_banner->imgfid = '';
+  return $blank_banner;
+}
+
+/**
+ * A page that will display a form for changing how weebpal banner will function
+ */
+function weebpal_banner_settings($form, $form_state) {
+  // TODO: need to find a better way of doing this
+  $errors_current_setting = 1;
+  if ( variable_get('weebpal_banner_display_errors', BANNER_DEFAULT_ERROR) ) {
+    $errors_current_setting = 0;
+  }
+
+  $form['display_setting'] = array(
+    '#type'          => 'radios',
+    '#title'         => t('Display Setting'),
+    '#options'       => drupal_map_assoc(array(t('url'), t('text'), t('urltext'), t('urllink'))),
+    '#default_value' => variable_get( 'weebpal_banner_display_setting', BANNER_DEFAULT_OUTPUT ),
+    '#description'   => t('What display pattern do you want the module to follow in the template file?'),
+    '#required'      => TRUE,
+  );
+  $form['display_errors'] = array(
+    '#type'          => 'radios',
+    '#title'         => t('Display Errors?'),
+    '#options'       => array(t('yes'), t('no')),
+    '#default_value' => $errors_current_setting,
+    '#description'   => t('If weebpal banner can not find a banner for the current page do you want it to display an error?'),
+    '#required'      => TRUE,
+  ); // Does this still work when there is a default banner
+  $form['image_save_path'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Image save path'),
+    '#default_value' => variable_get('weebpal_banner_file_save_path', BANNER_DEFAULT_SAVE_LOCATION),
+    '#description'   => t('This will be the path all banners get saved to when using the upload utility. \'public://\' is your sites files folder.'),
+    '#required'      => TRUE,
+  );
+  $form['submit'] = array(
+    '#type'          => 'submit',
+    '#value'         => t('Save'),
+  );
+
+  return $form;
+}
+
+/**
+ * When the settings form submits this function will save the settings for use
+ */
+function weebpal_banner_settings_submit($form, &$form_state) {
+  $display = $form_state['values']['display_setting'];
+  variable_set('weebpal_banner_display_setting', $display);
+
+  $errors = $form_state['values']['display_errors'];
+
+  // TODO: fix this
+  if ($errors == 0) {
+    variable_set('weebpal_banner_display_errors', TRUE);
+  }
+  else {
+    variable_set('weebpal_banner_display_errors', FALSE);
+  }
+
+  variable_set('weebpal_banner_file_save_path', $form_state['values']['image_save_path']);
+
+  $form_state['redirect'] = 'admin/structure/banners';
+}
+
+/**
+ * This function will load imgurl if there is no url for img
+ * Then it will load the fids into path format
+ *
+ * Input 1: The imgurl(s) that we are loading [maybe csv]
+ * Input 2: The imgfid(s) that we are loading [maybe csv]
+ */
+function weebpal_banner_image_handler($imgurl, $imgfid) {
+  // We have found the imgurl already in the right format return it
+  if ($imgurl && $imgurl != '') {
+    return $imgurl;
+  }
+  else {
+    if (strrpos($imgfid, ',')) {
+      // Split the plain string into an array
+      $all_fids = explode(",", $imgfid);
+      // Load all files at once
+      $all_files = file_load_multiple($all_fids);
+      $retval = ""; // Default the return string
+      // Go into all the loaded files
+      foreach ($all_files as $file) {
+        // If this is the first time through do not add a comma to the string
+        if ($retval != "") {
+          $retval .= ",";
+        }
+        // Have to translate the public string in the uri back into something browsers understand
+        $retval .= file_create_url($file->uri);
+      }
+      return $retval;
+    }
+    else {
+      $file = file_load($imgfid);
+      // Have to translate the public string in the uri back into something browsers understand
+      $file_path = file_create_url($file->uri);
+      return $file_path;
+    }
+  }
+}
+
+/**
+ * This function will split the csv fid variable if it needs to be split
+ * And then delete those images from the file system and their values in the db
+ */
+function weebpal_banner_image_delete($fid) {
+  if (strrpos($fid, ',')) {
+    // Split the plain string into an array
+    $all_fids = explode(",", $fid);
+    // Load all files at once
+    $all_files = file_load_multiple($all_fids);
+
+    foreach ($all_files as $file) {
+      if ($file) {
+        // When a module is managing a file, it must manage the usage count.
+        // Here we decrement the usage count with file_usage_delete().
+        file_usage_delete($file, 'weebpal_banner', 'banner', 1);
+
+        // The file_delete() function takes a file object and checks to see if
+        // The file is being used by any other modules. If it is the delete
+        // Operation is cancelled, otherwise the file is deleted.
+        file_delete($file);
+      }
+
+      drupal_set_message(t('The image @image_name was removed.', array('@image_name' => $file->filename)));
+    }
+  }
+  else {
+    $file = $fid ? file_load($fid) : FALSE;
+
+    if ($file) {
+      // When a module is managing a file, it must manage the usage count.
+      // Here we decrement the usage count with file_usage_delete().
+      file_usage_delete($file, 'weebpal_banner', 'banner', 1);
+
+      // The file_delete() function takes a file object and checks to see if
+      // The file is being used by any other modules. If it is the delete
+      // Operation is cancelled, otherwise the file is deleted.
+      file_delete($file);
+    }
+
+    drupal_set_message(t('The image @image_name was removed.', array('@image_name' => $file->filename)));
+  }
+}

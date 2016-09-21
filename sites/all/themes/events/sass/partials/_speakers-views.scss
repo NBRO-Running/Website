@@ -1,0 +1,194 @@
+/* speakers-views */
+.views-field-field-social {
+    .item-list ul {
+        @extend %item-list-ul;
+        li {
+            display: inline-block;
+            margin: 0;
+        }
+    }
+}
+
+.speakers-views {
+    .views-row {
+        margin-left: -30px;
+    }
+    .col-inner {
+        border: 1px solid rgba(white, 0.2);
+        margin-left: 30px;
+        overflow: hidden;
+        position: relative;
+        padding: 15px;
+        @extend %center;
+        &:hover {
+            .views-field-type-image {
+                &:before {
+                    background: rgba(black, 0.9);
+                    height: 100%;
+                }
+            }
+            .speakers-info {
+                height: 100%;
+                top: 40%;
+            }
+            .views-field-field-career {
+                padding-bottom: 0;
+            }
+        }
+    }
+    .views-field, .field {
+        margin-bottom: 0;
+    }
+    .views-field-name {
+        color: white;
+        @include title-font-md;
+        font: {
+            size: $fontsize-25;
+            weight: 700;
+        };
+        line-height: 1;
+        a {
+            color: white;
+            &:hover, &:focus {
+                color: $primary-color;
+            }
+        }
+    }
+    .views-field-field-career {
+        color: $primary-color;
+        font: {
+            size: $fontsize-20;
+            weight: 700;
+        };
+        @include title-font-lg;
+        padding-bottom: 15px;
+    }
+    .speakers-info {
+        bottom: 15px;
+        height: 65px;
+        left: 15px;
+        padding-bottom: 15px;
+        position: absolute;
+        right: 15px;
+        @include transition(all 0.5s ease);
+    }
+    .views-field-type-image {
+        position: relative;
+        &:before {
+            position: absolute;
+            width: 100%;
+            height: 80px;
+            content: "";
+            left: 0;
+            bottom: 0;
+            background: rgba(black, 0.1);
+            background: -moz-linear-gradient(top, rgba(black, 0) 0%, rgba(black, 0.7) 40%, rgba(black, 0.9) 100%);
+            /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(black, 0)), color-stop(40%, rgba(black, 0.7)), color-stop(100%, rgba(black, 0.9)));
+            /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, rgba(black, 0) 0%, rgba(black, 0.7) 40%, rgba(black, 0.9) 100%);
+            /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, rgba(black, 0) 0%, rgba(black, 0.7) 40%, rgba(black, 0.9) 100%);
+            /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, rgba(black, 0) 0%, rgba(black, 0.7) 40%, rgba(black, 0.9) 100%);
+            /* IE10+ */
+            background: linear-gradient(to bottom, rgba(black, 0) 0%, rgba(black, 0.7) 40%, rgba(black, 0.9) 100%);
+            @include transition(all 0.5s ease);
+        }
+    }
+    .views-field-description {
+        height: 70px;
+        overflow: hidden;
+        padding: 0 10px;
+        margin-bottom: 10px;
+    }
+    .socials-wrapper {
+        > div {
+            display: inline-block;
+        }
+        a {
+            display: block;
+            font-size: $fontsize-16;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 -2px;
+            position: relative;
+            width: 40px;
+        }
+    }
+    .views-field-description p {
+        margin: 0;
+    }
+    .views-exposed-form {
+        margin-bottom: 70px;
+        label {
+            font-weight: normal;
+            padding-right: 10px;
+        }
+        label, .views-widget, .views-exposed-widget {
+            display: inline-block;
+            padding: 0;
+        }
+        .views-exposed-widget {
+            width: 85%;
+            .views-widget {
+                width: 77%;
+            }
+            .form-item {
+                width: 100%;
+            }
+        }
+        .form-text {
+            background-color: #000;
+            border: 1px solid #1e1e1e;
+            font-style: italic;
+            width: 100%;
+            height: 44px;
+        }
+        .form-submit {
+            margin-top: 0;
+            padding: 8px 60px;
+        }
+        .views-widget-filter-title {
+            width: 84%;
+            float: left;
+            padding: {
+                top: 0;
+                right: 0;
+            };
+            .views-widget {
+                width: 87%;
+            }
+            .form-item {
+                width: 100%;
+            }
+        }
+        .views-submit-button {
+            width: auto;
+            float: left;
+            text-align: right;
+            padding: {
+                top: 0;
+                right: 0;
+            };
+        }
+    }
+}
+
+/* end page speaker */
+
+@media (min-width: 992px) and (max-width: 1200px) {
+    .speakers-views {
+        .views-exposed-form {
+            .views-exposed-widget {
+                width: 82%;
+                .views-widget {
+                    width: 70%;
+                }
+            }
+            .views-submit-button {
+                width: auto;
+            }
+        }
+    }
+}
